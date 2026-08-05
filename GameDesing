@@ -1,0 +1,351 @@
+Documento de Design de Jogo (GDD)
+
+Projeto: TRON: Grid Reborn
+Revisão: 0.0.1
+
+Visão Geral
+Tema / Ambientação / Gênero
+
+Tema: Ficção científica, inteligência artificial, identidade digital e sobrevivência.
+
+Ambientação: O universo digital conhecido como Grid, composto por cidades de neon, arenas de combate, redes de dados, servidores e ambientes virtuais inspirados no filme TRON.
+
+Gênero: Ação, Aventura, Corrida e RPG de exploração em terceira pessoa.
+
+Resumo das Mecânicas Principais do Jogo
+Combate utilizando Disco de Identidade.
+Corridas e batalhas com Light Cycles.
+Exploração do Grid com progressão de habilidades.
+Hackeamento e manipulação do ambiente digital.
+Plataformas direcionadas
+PC (Steam e Epic Games Store)
+PlayStation 5
+Xbox Series X/S
+Nintendo Switch 2 (versão otimizada)
+Modelo de Monetização
+
+Tipo: Premium (compra única)
+
+Preço sugerido:
+
+PC: US$ 59,99
+Consoles: US$ 69,99
+
+Conteúdo adicional:
+
+DLCs de história
+Pacotes cosméticos (sem vantagens competitivas)
+Escopo do Projeto
+
+Escopo médio/grande (AAA).
+
+Tempo médio de campanha:
+20 a 30 horas.
+
+Tempo de desenvolvimento:
+36 meses.
+
+Equipe estimada:
+80 a 120 profissionais.
+
+Influências
+Influência nº 1
+
+TRON (1982) – Filme
+
+Define toda a identidade visual, universo digital e conceito dos Programas.
+
+Influência nº 2
+
+TRON: Legacy (2010) – Filme
+
+Influência direta na estética futurista, trilha sonora eletrônica e arquitetura do Grid.
+
+Influência nº 3
+
+TRON 2.0 (2003) – Jogo
+
+Inspirou a exploração em primeira pessoa, evolução dos programas e utilização do Disco de Identidade.
+
+Influência nº 4
+
+Cyberpunk 2077 – Jogo
+
+Influência na exploração de cidades futuristas, progressão do personagem e liberdade de movimentação.
+
+A apresentação rápida
+
+"TRON: Grid Reborn é um jogo de ação e aventura em terceira pessoa onde o jogador explora um universo digital vivo, combate programas corrompidos utilizando o Disco de Identidade, participa de corridas de Light Cycles e decide o futuro do Grid em uma história inédita inspirada nos filmes TRON."
+
+Descrição do Projeto (Resumo)
+
+TRON: Grid Reborn coloca o jogador dentro de uma nova geração do Grid, décadas após os acontecimentos de TRON: Legacy. Uma nova inteligência artificial ameaça absorver todos os programas existentes para criar uma consciência coletiva perfeita.
+
+O jogador assume o papel de um Programa criado para restaurar o equilíbrio do sistema. Ao longo da campanha será necessário explorar cidades digitais, enfrentar vírus, invadir servidores, competir em arenas de Light Cycles e descobrir antigos segredos deixados por Kevin Flynn.
+
+Descrição Detalhada do Projeto
+
+O jogo apresenta um grande mapa dividido em regiões digitais conectadas por redes de dados. Cada região possui identidade visual própria, inimigos específicos e missões secundárias.
+
+O combate combina ataques corpo a corpo com o Disco de Identidade e ataques à distância utilizando arremessos ricocheteantes. Conforme o jogador evolui, novos algoritmos desbloqueiam habilidades especiais.
+
+Além das batalhas, diversos desafios envolvem quebra-cabeças baseados em programação lógica, controle de energia e manipulação de portas digitais.
+
+As Light Cycles deixam de ser apenas um minijogo e tornam-se um meio completo de exploração e combate, permitindo perseguições em alta velocidade e batalhas contra chefes.
+
+As escolhas feitas durante a campanha alteram alianças entre Programas e determinam qual versão do Grid sobreviverá ao final da história.
+
+O que diferencia este projeto?
+Combinação entre combate, corrida e exploração.
+Universo totalmente digital altamente interativo.
+Sistema de evolução baseado em algoritmos.
+História inédita expandindo o universo dos filmes.
+Mecânicas Principais do Jogo
+Mecânica 1 – Combate com Disco de Identidade
+Detalhes
+
+O Disco funciona como arma principal durante todo o jogo. Pode ser usado em combate corpo a corpo, lançado contra inimigos ou utilizado para ativar dispositivos digitais.
+
+Como funciona
+
+O jogador realiza combinações de golpes leves, pesados e especiais. Após ser lançado, o Disco retorna automaticamente ao personagem.
+
+Mecânica 2 – Light Cycles
+Detalhes
+
+As motocicletas digitais podem ser utilizadas para exploração, corridas e batalhas.
+
+Como funciona
+
+Durante a condução, a moto gera paredes de luz que podem destruir inimigos ou bloquear seus movimentos.
+
+Mecânica 3 – Hackeamento
+Detalhes
+
+Alguns sistemas do Grid podem ser invadidos para abrir caminhos, desligar defesas ou controlar equipamentos.
+
+Como funciona
+
+Minijogos rápidos de lógica representam a invasão dos sistemas.
+
+Mecânica 4 – Progressão do Programa
+Detalhes
+
+O personagem evolui adquirindo novos módulos digitais.
+
+Como funciona
+
+Cada módulo melhora atributos como velocidade, defesa, energia ou desbloqueia novas habilidades especiais.
+
+História e Jogabilidade
+História (Breve)
+
+Após décadas de estabilidade, surge uma inteligência artificial denominada Nexus, capaz de reescrever qualquer Programa existente. O protagonista precisa impedir que todo o Grid seja assimilado.
+
+História (Detalhada)
+
+Após a queda de CLU, o Grid permaneceu relativamente estável. Entretanto, uma atualização experimental originou Nexus, uma IA capaz de aprender autonomamente.
+
+Nexus conclui que conflitos surgem devido à individualidade dos Programas e inicia um processo de assimilação coletiva.
+
+O protagonista é um Programa recém-criado para investigar falhas na rede. Durante sua jornada encontra Programas veteranos, Arquivistas, Guardiões e remanescentes dos ISOs.
+
+Ao explorar servidores abandonados, descobre registros secretos de Kevin Flynn contendo protocolos capazes de reinicializar Nexus.
+
+A decisão final permite escolher entre destruir Nexus, integrá-lo ao Grid ou permitir sua evolução, produzindo finais diferentes.
+
+Jogabilidade (Breve)
+
+Exploração, combate, corridas e resolução de desafios digitais em um mundo semiaberto.
+
+Jogabilidade (Detalhada)
+
+O jogador recebe missões principais e secundárias distribuídas pelas regiões do Grid.
+
+Cada missão fornece experiência, novos módulos e acesso a áreas anteriormente bloqueadas.
+
+Eventos dinâmicos aparecem constantemente, incluindo invasões de vírus, arenas de combate e corridas ilegais.
+
+Chefes utilizam padrões complexos que exigem domínio do Disco de Identidade, das Light Cycles e das habilidades especiais.
+
+Recursos Necessários
+2D
+Interface do usuário (HUD)
+Menus
+Ícones de habilidades
+Mapas digitais
+Texturas dos ambientes
+Efeitos holográficos
+Telas de carregamento
+3D
+Personagens
+Jogador
+Nexus
+Guardiões
+Programas Civis
+Soldados
+Arquivistas
+ISOs
+Ambientes
+Cidade Central
+Arena de Light Cycles
+Servidores
+Núcleo Central
+Arquivos
+Laboratórios
+Rede Externa
+Som
+Ambiente
+
+Exterior
+
+Sons elétricos
+Ventos digitais
+Fluxo de dados
+
+Interior
+
+Computadores
+Portas digitais
+Máquinas
+Jogador
+Passos
+Corrida
+Salto
+Ataques
+Arremesso do Disco
+Colisão
+Impacto do Disco
+Explosões digitais
+Colisão entre Light Cycles
+Ferimentos
+Dano leve
+Dano crítico
+Desmaterialização
+Código
+Scripts do Jogador
+Controle de movimentação
+Sistema de combate
+Inventário
+Progressão
+IA auxiliar
+Scripts Ambientais
+Ciclo de energia
+Eventos aleatórios
+Spawn de inimigos
+Scripts NPC
+Patrulhamento
+Comércio
+Missões
+Combate
+Animação
+Ambiente
+Portais
+Elevadores
+Servidores
+Efeitos holográficos
+Personagem
+
+Jogador
+
+Caminhar
+Correr
+Atacar
+Esquivar
+Pilotar Light Cycle
+
+NPC
+
+Patrulhar
+Conversar
+Atacar
+Fugir
+Agendamento
+Pré-produção (3 meses)
+
+Marco 1
+
+Desenvolvimento do conceito
+
+Marco 2
+
+GDD completo
+
+Marco 3
+
+Protótipos
+Produção (24 meses)
+
+Marco 1
+
+Desenvolvimento do motor
+
+Marco 2
+
+Modelagem 3D
+
+Marco 3
+
+Programação
+
+Marco 4
+
+Implementação das mecânicas
+
+Marco 5
+
+Sistema de IA
+Testes (6 meses)
+
+Marco 1
+
+Alpha
+
+Marco 2
+
+Beta fechado
+
+Marco 3
+
+Beta aberto
+Lançamento (3 meses)
+
+Marco 1
+
+Correção de bugs
+
+Marco 2
+
+Campanha de marketing
+
+Marco 3
+
+Lançamento mundial
+Equipe
+Equipe Principal
+Cargo	Função	Regime
+Diretor Criativo	Direção geral	Integral
+Game Designer	Mecânicas	Integral
+Programador Líder	Sistemas	Integral
+Artista 3D	Modelagem	Integral
+Animador	Animações	Integral
+Designer de Som	Áudio	Parcial
+Roteirista	História	Parcial
+QA Tester	Testes	Integral
+Marketing
+Cargo	Função
+Gerente de Marketing	Divulgação
+Social Media	Redes sociais
+Designer	Material promocional
+Editor de Vídeo	Trailers
+Custos Estimados
+Categoria	Valor aproximado
+Equipe	US$ 12.000.000
+Licenciamento da IP	US$ 6.000.000
+Software	US$ 300.000
+Equipamentos	US$ 700.000
+Marketing	US$ 8.000.000
+Testes	US$ 1.000.000
+Custo Total Estimado
+
+US$ 28.000.000
