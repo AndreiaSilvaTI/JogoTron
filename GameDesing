@@ -1,15 +1,11 @@
 Documento de Design de Jogo (GDD)
 
-Projeto: TRON: Grid Reborn
-Revisão: 0.0.1
+Projeto: TRON
 
 Visão Geral
 Tema / Ambientação / Gênero
-
 Tema: Ficção científica, inteligência artificial, identidade digital e sobrevivência.
-
 Ambientação: O universo digital conhecido como Grid, composto por cidades de neon, arenas de combate, redes de dados, servidores e ambientes virtuais inspirados no filme TRON.
-
 Gênero: Ação, Aventura, Corrida e RPG de exploração em terceira pessoa.
 
 Resumo das Mecânicas Principais do Jogo
@@ -22,23 +18,19 @@ PC (Steam e Epic Games Store)
 PlayStation 5
 Xbox Series X/S
 Nintendo Switch 2 (versão otimizada)
+
 Modelo de Monetização
-
 Tipo: Premium (compra única)
-
 Preço sugerido:
-
 PC: US$ 59,99
 Consoles: US$ 69,99
 
 Conteúdo adicional:
-
 DLCs de história
 Pacotes cosméticos (sem vantagens competitivas)
+
 Escopo do Projeto
-
 Escopo médio/grande (AAA).
-
 Tempo médio de campanha:
 20 a 30 horas.
 
@@ -50,36 +42,26 @@ Equipe estimada:
 
 Influências
 Influência nº 1
-
 TRON (1982) – Filme
-
 Define toda a identidade visual, universo digital e conceito dos Programas.
-
 Influência nº 2
-
 TRON: Legacy (2010) – Filme
-
 Influência direta na estética futurista, trilha sonora eletrônica e arquitetura do Grid.
 
 Influência nº 3
-
 TRON 2.0 (2003) – Jogo
-
 Inspirou a exploração em primeira pessoa, evolução dos programas e utilização do Disco de Identidade.
 
 Influência nº 4
-
 Cyberpunk 2077 – Jogo
-
 Influência na exploração de cidades futuristas, progressão do personagem e liberdade de movimentação.
 
 A apresentação rápida
-
-"TRON: Grid Reborn é um jogo de ação e aventura em terceira pessoa onde o jogador explora um universo digital vivo, combate programas corrompidos utilizando o Disco de Identidade, participa de corridas de Light Cycles e decide o futuro do Grid em uma história inédita inspirada nos filmes TRON."
+"TRON é um jogo de ação e aventura em terceira pessoa onde o jogador explora um universo digital vivo, combate programas corrompidos utilizando o Disco de Identidade, participa de corridas de Light Cycles e decide o futuro do Grid em uma história inédita inspirada nos filmes TRON."
 
 Descrição do Projeto (Resumo)
 
-TRON: Grid Reborn coloca o jogador dentro de uma nova geração do Grid, décadas após os acontecimentos de TRON: Legacy. Uma nova inteligência artificial ameaça absorver todos os programas existentes para criar uma consciência coletiva perfeita.
+TRON coloca o jogador dentro de uma nova geração do Grid, décadas após os acontecimentos de TRON: Legacy. Uma nova inteligência artificial ameaça absorver todos os programas existentes para criar uma consciência coletiva perfeita.
 
 O jogador assume o papel de um Programa criado para restaurar o equilíbrio do sistema. Ao longo da campanha será necessário explorar cidades digitais, enfrentar vírus, invadir servidores, competir em arenas de Light Cycles e descobrir antigos segredos deixados por Kevin Flynn.
 
@@ -100,72 +82,50 @@ Combinação entre combate, corrida e exploração.
 Universo totalmente digital altamente interativo.
 Sistema de evolução baseado em algoritmos.
 História inédita expandindo o universo dos filmes.
+
 Mecânicas Principais do Jogo
 Mecânica 1 – Combate com Disco de Identidade
 Detalhes
-
 O Disco funciona como arma principal durante todo o jogo. Pode ser usado em combate corpo a corpo, lançado contra inimigos ou utilizado para ativar dispositivos digitais.
-
 Como funciona
-
 O jogador realiza combinações de golpes leves, pesados e especiais. Após ser lançado, o Disco retorna automaticamente ao personagem.
-
 Mecânica 2 – Light Cycles
 Detalhes
-
 As motocicletas digitais podem ser utilizadas para exploração, corridas e batalhas.
-
 Como funciona
-
 Durante a condução, a moto gera paredes de luz que podem destruir inimigos ou bloquear seus movimentos.
 
 Mecânica 3 – Hackeamento
 Detalhes
-
 Alguns sistemas do Grid podem ser invadidos para abrir caminhos, desligar defesas ou controlar equipamentos.
-
 Como funciona
-
 Minijogos rápidos de lógica representam a invasão dos sistemas.
 
 Mecânica 4 – Progressão do Programa
 Detalhes
-
 O personagem evolui adquirindo novos módulos digitais.
-
 Como funciona
-
 Cada módulo melhora atributos como velocidade, defesa, energia ou desbloqueia novas habilidades especiais.
 
 História e Jogabilidade
 História (Breve)
-
 Após décadas de estabilidade, surge uma inteligência artificial denominada Nexus, capaz de reescrever qualquer Programa existente. O protagonista precisa impedir que todo o Grid seja assimilado.
 
 História (Detalhada)
 
 Após a queda de CLU, o Grid permaneceu relativamente estável. Entretanto, uma atualização experimental originou Nexus, uma IA capaz de aprender autonomamente.
-
 Nexus conclui que conflitos surgem devido à individualidade dos Programas e inicia um processo de assimilação coletiva.
-
 O protagonista é um Programa recém-criado para investigar falhas na rede. Durante sua jornada encontra Programas veteranos, Arquivistas, Guardiões e remanescentes dos ISOs.
-
 Ao explorar servidores abandonados, descobre registros secretos de Kevin Flynn contendo protocolos capazes de reinicializar Nexus.
-
 A decisão final permite escolher entre destruir Nexus, integrá-lo ao Grid ou permitir sua evolução, produzindo finais diferentes.
 
 Jogabilidade (Breve)
-
 Exploração, combate, corridas e resolução de desafios digitais em um mundo semiaberto.
 
 Jogabilidade (Detalhada)
-
 O jogador recebe missões principais e secundárias distribuídas pelas regiões do Grid.
-
 Cada missão fornece experiência, novos módulos e acesso a áreas anteriormente bloqueadas.
-
 Eventos dinâmicos aparecem constantemente, incluindo invasões de vírus, arenas de combate e corridas ilegais.
-
 Chefes utilizam padrões complexos que exigem domínio do Disco de Identidade, das Light Cycles e das habilidades especiais.
 
 Recursos Necessários
@@ -198,13 +158,11 @@ Som
 Ambiente
 
 Exterior
-
 Sons elétricos
 Ventos digitais
 Fluxo de dados
 
 Interior
-
 Computadores
 Portas digitais
 Máquinas
@@ -247,7 +205,6 @@ Efeitos holográficos
 Personagem
 
 Jogador
-
 Caminhar
 Correr
 Atacar
@@ -255,7 +212,6 @@ Esquivar
 Pilotar Light Cycle
 
 NPC
-
 Patrulhar
 Conversar
 Atacar
@@ -264,62 +220,48 @@ Agendamento
 Pré-produção (3 meses)
 
 Marco 1
-
 Desenvolvimento do conceito
 
 Marco 2
-
 GDD completo
 
 Marco 3
-
 Protótipos
 Produção (24 meses)
 
 Marco 1
-
 Desenvolvimento do motor
 
 Marco 2
-
 Modelagem 3D
 
 Marco 3
-
 Programação
 
 Marco 4
-
 Implementação das mecânicas
 
 Marco 5
-
 Sistema de IA
 Testes (6 meses)
 
 Marco 1
-
 Alpha
 
 Marco 2
-
 Beta fechado
 
 Marco 3
-
 Beta aberto
 Lançamento (3 meses)
 
 Marco 1
-
 Correção de bugs
 
 Marco 2
-
 Campanha de marketing
 
 Marco 3
-
 Lançamento mundial
 Equipe
 Equipe Principal
@@ -338,6 +280,7 @@ Gerente de Marketing	Divulgação
 Social Media	Redes sociais
 Designer	Material promocional
 Editor de Vídeo	Trailers
+
 Custos Estimados
 Categoria	Valor aproximado
 Equipe	US$ 12.000.000
@@ -346,6 +289,4 @@ Software	US$ 300.000
 Equipamentos	US$ 700.000
 Marketing	US$ 8.000.000
 Testes	US$ 1.000.000
-Custo Total Estimado
-
-US$ 28.000.000
+Custo Total Estimado US$ 28.000.000
