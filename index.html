@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRON // GRID PROTÓTIPO</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/estilo.css">
+<link rel="stylesheet" href="css/interface.css">
+</head>
+<body>
+
+  <!-- ===================== ÁREA DO JOGO (CANVAS) ===================== -->
+  <div id="game-container">
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- ===================== INTERFACE / HUD ===================== -->
+    <div id="hud">
+      <div id="hud-vida" class="hud-barra">
+        <span class="hud-label">VIDA</span>
+        <div class="barra-fundo"><div id="barra-vida" class="barra-preenchimento barra-vida-cor"></div></div>
+      </div>
+      <div id="hud-energia" class="hud-barra">
+        <span class="hud-label">ENERGIA</span>
+        <div class="barra-fundo"><div id="barra-energia" class="barra-preenchimento barra-energia-cor"></div></div>
+      </div>
+      <div id="hud-modo">MODO: <span id="hud-modo-texto">A PÉ</span></div>
+    </div>
+
+    <!-- ===================== TELA DE MENU INICIAL ===================== -->
+    <div id="tela-menu" class="tela-overlay">
+      <h1 class="titulo-tron">TRON</h1>
+      <p class="subtitulo-tron">// PROTÓTIPO DO GRID //</p>
+      <button id="btn-iniciar" class="botao-tron">ENTRAR NO GRID</button>
+      <div class="instrucoes">
+        <p><strong>WASD / Setas</strong> — mover</p>
+        <p><strong>ESPAÇO</strong> — arremessar Disco de Identidade</p>
+        <p><strong>C</strong> — montar / desmontar Light Cycle</p>
+      </div>
+    </div>
+
+    <!-- ===================== TELA DE DERROTA ===================== -->
+    <div id="tela-derrota" class="tela-overlay escondido">
+      <h1 class="titulo-tron titulo-derrota">DESMATERIALIZADO</h1>
+      <p class="subtitulo-tron">Seu programa foi corrompido pelo Grid.</p>
+      <button id="btn-reiniciar" class="botao-tron">REINICIALIZAR</button>
+    </div>
+  </div>
+
+  <!-- ===================== SCRIPTS ===================== -->
+  <!-- Ordem importa: personagens e armas definem classes usadas pelo game.js -->
+  <script src="js/personagens.js"></script>
+  <script src="js/armas.js"></script>
+  <script src="js/interface.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+/* ============================================================
+   ESTILO.CSS — Base geral do jogo (reset, tema, canvas)
+   ============================================================ */
+
+:root {
+  --azul-neon: #4de3ff;
+  --azul-neon-escuro: #0f7a99;
+  --laranja-neon: #ff9331;
+  --preto-grid: #030710;
+  --preto-painel: #071018;
+  --vermelho-alerta: #ff3b3b;
+  --fonte-tron: 'Orbitron', 'Courier New', monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: var(--preto-grid);
+  overflow: hidden;
+  font-family: var(--fonte-tron);
+}
+
+#game-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: var(--preto-grid);
+}
+
+#gameCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--preto-grid);
+}
+
+.escondido {
+  display: none !important;
+}

@@ -1,0 +1,128 @@
+/* ============================================================
+   INTERFACE.CSS — HUD, menus e telas de overlay
+   ============================================================ */
+
+/* ---------- HUD (durante o jogo) ---------- */
+#hud {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.hud-barra {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hud-label {
+  color: var(--azul-neon);
+  font-size: 12px;
+  letter-spacing: 2px;
+  width: 70px;
+  text-shadow: 0 0 6px var(--azul-neon);
+}
+
+.barra-fundo {
+  width: 200px;
+  height: 14px;
+  background: rgba(10, 20, 30, 0.8);
+  border: 1px solid var(--azul-neon-escuro);
+  box-shadow: 0 0 8px rgba(77, 227, 255, 0.3);
+}
+
+.barra-preenchimento {
+  height: 100%;
+  width: 100%;
+  transition: width 0.15s ease-out;
+}
+
+.barra-vida-cor {
+  background: linear-gradient(90deg, #ff3b3b, #ff8a4d);
+  box-shadow: 0 0 10px #ff5b3b;
+}
+
+.barra-energia-cor {
+  background: linear-gradient(90deg, var(--azul-neon-escuro), var(--azul-neon));
+  box-shadow: 0 0 10px var(--azul-neon);
+}
+
+#hud-modo {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--laranja-neon);
+  text-shadow: 0 0 6px var(--laranja-neon);
+  letter-spacing: 1px;
+}
+
+/* ---------- Telas de overlay (menu / derrota) ---------- */
+.tela-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: rgba(3, 7, 16, 0.92);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  text-align: center;
+}
+
+.titulo-tron {
+  font-size: 64px;
+  font-weight: 900;
+  letter-spacing: 14px;
+  color: var(--azul-neon);
+  text-shadow: 0 0 12px var(--azul-neon), 0 0 40px var(--azul-neon-escuro);
+}
+
+.titulo-derrota {
+  color: var(--vermelho-alerta);
+  text-shadow: 0 0 12px var(--vermelho-alerta), 0 0 40px #7a0f0f;
+  font-size: 44px;
+  letter-spacing: 8px;
+}
+
+.subtitulo-tron {
+  color: var(--azul-neon-escuro);
+  letter-spacing: 4px;
+  font-size: 14px;
+}
+
+.botao-tron {
+  margin-top: 10px;
+  padding: 14px 36px;
+  background: transparent;
+  color: var(--azul-neon);
+  border: 2px solid var(--azul-neon);
+  font-family: var(--fonte-tron);
+  font-size: 16px;
+  letter-spacing: 3px;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(77, 227, 255, 0.4);
+  transition: all 0.2s ease;
+}
+
+.botao-tron:hover {
+  background: var(--azul-neon);
+  color: var(--preto-grid);
+  box-shadow: 0 0 25px var(--azul-neon);
+}
+
+.instrucoes {
+  margin-top: 20px;
+  color: #6ab0c4;
+  font-size: 12px;
+  line-height: 1.8;
+  letter-spacing: 1px;
+}
+
+.instrucoes strong {
+  color: var(--laranja-neon);
+}
