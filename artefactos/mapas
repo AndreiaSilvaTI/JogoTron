@@ -1,1 +1,779 @@
-cccc
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE GRID // protótipo (preview em arquivo único)</title>
+<style>
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #020507;
+  font-family: 'Consolas', 'Courier New', monospace;
+  color: #eafcff;
+}
+
+#game-canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+
+.hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.hud-top {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  letter-spacing: 0.15em;
+  font-size: 12px;
+  color: #5ef4ff;
+  text-shadow: 0 0 6px rgba(94, 244, 255, 0.6);
+}
+
+.hud-top span {
+  display: block;
+  opacity: 0.6;
+  font-size: 10px;
+  margin-top: 4px;
+  color: #6fa8b3;
+  text-shadow: none;
+}
+
+.hud-fps {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: #3d6068;
+}
+
+.hud-legend {
+  position: absolute;
+  bottom: 18px;
+  left: 18px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  line-height: 1.8;
+  color: #6fa8b3;
+  text-transform: uppercase;
+}
+
+.hud-legend b {
+  color: #5ef4ff;
+}
+
+.hud-mode {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #5ef4ff;
+  text-shadow: 0 0 8px rgba(94, 244, 255, 0.6);
+  transition: color 0.15s, text-shadow 0.15s;
+}
+
+.hud-mode.crashed {
+  color: #ff3b3b;
+  text-shadow: 0 0 10px rgba(255, 59, 59, 0.8);
+}
+
+</style>
+</head>
+<body>
+
+
+<canvas id="game-canvas"></canvas>
+
+<div class="hud">
+  <div class="hud-top">
+    <span id="hud-coords">SETOR 24:24</span>
+    <span>WASD / SETAS — mover · [E] alternar Light Cycle</span>
+  </div>
+  <div class="hud-fps" id="hud-fps">-- FPS</div>
+  <div class="hud-mode" id="hud-mode">◈ A PÉ</div>
+  <div class="hud-legend">
+    <div><b style="color:#5ef4ff">▮</b> condutor de energia</div>
+    <div><b style="color:#ff8a3d">◯</b> ponto de spawn</div>
+    <div><b style="color:#fff">◉</b> portal de setor</div>
+    <div><b style="color:#0d1e26">■</b> barreira</div>
+  </div>
+</div>
+
+<script>
+/**
+ * grid.js
+ * ---------------------------------------------------------------
+ * Módulo responsável pelo MUNDO do jogo: o Grid.
+ * O mapa é uma MATRIZ 2D FIXA (escrita à mão, abaixo em MAP_LAYOUT)
+ * em vez de gerado por algoritmo — fica simples de ler, editar e
+ * entender o layout inteiro só olhando o array de strings.
+ *
+ * Este módulo é independente de personagens/armas — ele só expõe
+ * uma API (isWalkable, worldToTile, getTile, render) para que os
+ * outros sistemas (Light Cycle, jogador, IA, disco) consultem o
+ * mundo sem precisar conhecer os detalhes internos do mapa.
+ * ---------------------------------------------------------------
+ */
+
+// Tipos de tile do Grid
+const TILE = {
+  FLOOR: 0,      // piso comum, andável
+  WALL: 1,       // barreira de energia, sólida
+  CONDUIT: 2,    // piso com linha de energia principal (andável, decorativo)
+  SPAWN: 3,      // ponto de geração (andável, marcado no piso)
+  PORTAL: 4,     // portal/saída de setor (andável, efeito especial)
+};
+
+// Legenda da matriz:
+//   #  parede / barreira de energia
+//   .  piso comum
+//   +  condutor de energia (piso decorativo, andável)
+//   S  ponto de spawn
+//   P  portal
+//
+// É só editar essas strings pra mudar o mapa — todas as linhas
+// precisam ter o mesmo número de caracteres.
+const MAP_LAYOUT = [
+  "######################",
+  "#######........#######",
+  "##....#........#....##",
+  "##.S..............S.##",
+  "##....#........#....##",
+  "#######++++++++#######",
+  "#.......###.###......#",
+  "#.......#.....#......#",
+  "#.......#.P.P.#......#",
+  "#.......#.....#......#",
+  "#######.###.##########",
+  "##++++#++++++++#++++##",
+  "##.S..............S.##",
+  "##....#........#....##",
+  "#######........#######",
+  "######################",
+];
+
+const CHAR_TO_TILE = {
+  '#': TILE.WALL,
+  '.': TILE.FLOOR,
+  '+': TILE.CONDUIT,
+  'S': TILE.SPAWN,
+  'P': TILE.PORTAL,
+};
+
+class Grid {
+  /**
+   * @param {number} tileSize - tamanho de cada tile em pixels
+   * @param {string[]} layout - matriz 2D fixa (array de strings), usa MAP_LAYOUT por padrão
+   */
+  constructor(tileSize = 40, layout = MAP_LAYOUT) {
+    this.tileSize = tileSize;
+    this.rows = layout.length;
+    this.cols = layout[0].length;
+
+    // matriz [row][col] com o tipo de cada tile, lida direto da matriz fixa
+    this.tiles = layout.map((rowStr) =>
+      rowStr.split('').map((ch) => CHAR_TO_TILE[ch] ?? TILE.FLOOR)
+    );
+
+    // pontos de spawn encontrados no mapa (usados pelo sistema de personagens depois)
+    this.spawnPoints = this._collectSpawnPoints();
+
+    // relógio interno usado só para animações de pulso (glow)
+    this._time = 0;
+  }
+
+  _collectSpawnPoints() {
+    const points = [];
+    for (let r = 0; r < this.rows; r++) {
+      for (let c = 0; c < this.cols; c++) {
+        if (this.tiles[r][c] === TILE.SPAWN) {
+          points.push({ col: c, row: r, x: c * this.tileSize, y: r * this.tileSize });
+        }
+      }
+    }
+    return points;
+  }
+
+  /* ---------------------------------------------------------- */
+  /* CONSULTAS (API usada por outros sistemas)                   */
+  /* ---------------------------------------------------------- */
+
+  /** Converte coordenadas do mundo (px) para coordenadas de tile. */
+  worldToTile(x, y) {
+    return {
+      col: Math.floor(x / this.tileSize),
+      row: Math.floor(y / this.tileSize),
+    };
+  }
+
+  /** Retorna o tipo de tile em uma posição (col, row). */
+  getTile(col, row) {
+    if (row < 0 || row >= this.rows || col < 0 || col >= this.cols) return TILE.WALL;
+    return this.tiles[row][col];
+  }
+
+  /** Diz se uma posição do mundo (em pixels) é andável. */
+  isWalkable(x, y) {
+    const { col, row } = this.worldToTile(x, y);
+    const t = this.getTile(col, row);
+    return t !== TILE.WALL;
+  }
+
+  /** Largura/altura totais do mundo em pixels. */
+  get pixelWidth() { return this.cols * this.tileSize; }
+  get pixelHeight() { return this.rows * this.tileSize; }
+
+  /* ---------------------------------------------------------- */
+  /* RENDERIZAÇÃO                                                */
+  /* ---------------------------------------------------------- */
+
+  /**
+   * Desenha o Grid na câmera fornecida.
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {{x:number,y:number,width:number,height:number}} camera - área visível em px do mundo
+   * @param {number} dt - delta time em segundos, para animações de pulso
+   */
+  render(ctx, camera, dt = 0) {
+    this._time += dt;
+    const { tileSize } = this;
+    const pulse = 0.55 + Math.sin(this._time * 2) * 0.25; // 0.3 a 0.8
+
+    // fundo do piso
+    ctx.fillStyle = '#050b10';
+    ctx.fillRect(0, 0, camera.width, camera.height);
+
+    const startCol = Math.max(0, Math.floor(camera.x / tileSize) - 1);
+    const endCol = Math.min(this.cols, Math.ceil((camera.x + camera.width) / tileSize) + 1);
+    const startRow = Math.max(0, Math.floor(camera.y / tileSize) - 1);
+    const endRow = Math.min(this.rows, Math.ceil((camera.y + camera.height) / tileSize) + 1);
+
+    // 1) piso base + grade fina
+    ctx.strokeStyle = 'rgba(30, 90, 102, 0.35)';
+    ctx.lineWidth = 1;
+    for (let r = startRow; r < endRow; r++) {
+      for (let c = startCol; c < endCol; c++) {
+        const t = this.tiles[r][c];
+        if (t === TILE.WALL) continue;
+        const sx = c * tileSize - camera.x;
+        const sy = r * tileSize - camera.y;
+        ctx.strokeRect(sx + 0.5, sy + 0.5, tileSize - 1, tileSize - 1);
+      }
+    }
+
+    // 2) condutores de energia (linhas do circuito), com leve pulso
+    ctx.save();
+    ctx.shadowColor = `rgba(94, 244, 255, ${pulse})`;
+    ctx.shadowBlur = 10;
+    ctx.strokeStyle = `rgba(94, 244, 255, ${pulse})`;
+    ctx.lineWidth = 2;
+    for (let r = startRow; r < endRow; r++) {
+      for (let c = startCol; c < endCol; c++) {
+        if (this.tiles[r][c] !== TILE.CONDUIT) continue;
+        const sx = c * tileSize - camera.x;
+        const sy = r * tileSize - camera.y;
+        ctx.strokeRect(sx + 4, sy + 4, tileSize - 8, tileSize - 8);
+      }
+    }
+    ctx.restore();
+
+    // 3) pontos de spawn
+    for (let r = startRow; r < endRow; r++) {
+      for (let c = startCol; c < endCol; c++) {
+        if (this.tiles[r][c] !== TILE.SPAWN) continue;
+        const sx = c * tileSize - camera.x + tileSize / 2;
+        const sy = r * tileSize - camera.y + tileSize / 2;
+        ctx.save();
+        ctx.strokeStyle = `rgba(255, 138, 61, ${pulse})`;
+        ctx.shadowColor = 'rgba(255, 138, 61, 0.8)';
+        ctx.shadowBlur = 12;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(sx, sy, tileSize * 0.32, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    // 4) portais
+    for (let r = startRow; r < endRow; r++) {
+      for (let c = startCol; c < endCol; c++) {
+        if (this.tiles[r][c] !== TILE.PORTAL) continue;
+        const sx = c * tileSize - camera.x + tileSize / 2;
+        const sy = r * tileSize - camera.y + tileSize / 2;
+        ctx.save();
+        const gradient = ctx.createRadialGradient(sx, sy, 2, sx, sy, tileSize * 0.6);
+        gradient.addColorStop(0, `rgba(255, 255, 255, ${0.5 + pulse * 0.4})`);
+        gradient.addColorStop(0.5, `rgba(94, 244, 255, ${pulse * 0.5})`);
+        gradient.addColorStop(1, 'rgba(94, 244, 255, 0)');
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(sx, sy, tileSize * 0.6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    // 5) barreiras (paredes) — desenhadas por último, com efeito de altura
+    for (let r = startRow; r < endRow; r++) {
+      for (let c = startCol; c < endCol; c++) {
+        if (this.tiles[r][c] !== TILE.WALL) continue;
+        const sx = c * tileSize - camera.x;
+        const sy = r * tileSize - camera.y;
+        this._drawWall(ctx, sx, sy, tileSize, pulse);
+      }
+    }
+  }
+
+  _drawWall(ctx, x, y, size, pulse) {
+    // base escura (sombra/profundidade)
+    ctx.fillStyle = '#020507';
+    ctx.fillRect(x, y, size, size);
+
+    // painel com leve gradiente para simular volume
+    const grad = ctx.createLinearGradient(x, y, x, y + size);
+    grad.addColorStop(0, '#0d1e26');
+    grad.addColorStop(1, '#030a0d');
+    ctx.fillStyle = grad;
+    ctx.fillRect(x + 2, y + 2, size - 4, size - 4);
+
+    // borda de energia brilhante
+    ctx.save();
+    ctx.shadowColor = `rgba(94, 244, 255, ${pulse})`;
+    ctx.shadowBlur = 8;
+    ctx.strokeStyle = `rgba(94, 244, 255, ${0.6 + pulse * 0.3})`;
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(x + 2, y + 2, size - 4, size - 4);
+    ctx.restore();
+  }
+}
+
+// expõe globalmente para uso em main.js e futuros módulos (personagens, armas...)
+window.TILE = TILE;
+window.MAP_LAYOUT = MAP_LAYOUT;
+window.Grid = Grid;
+
+</script>
+<script>
+/**
+ * player.js
+ * ---------------------------------------------------------------
+ * Módulo do PERSONAGEM. Cuida de:
+ *  - Movimento livre a pé (8 direções)
+ *  - Modo Light Cycle: movimento contínuo em 4 direções, com rastro
+ *    de luz que vira barreira (mecânica clássica do Tron)
+ *  - Colisão contra o Grid (grid.isWalkable) e contra o próprio rastro
+ *
+ * Depende apenas da API pública do Grid (window.Grid). Não conhece
+ * nada sobre armas/disco — isso fica pra um módulo separado depois.
+ * ---------------------------------------------------------------
+ */
+
+const PLAYER_MODE = {
+  FOOT: 'foot',
+  CYCLE: 'cycle',
+};
+
+// direções cardinais usadas pelo Light Cycle (grid-aligned)
+const DIRS = {
+  up: { x: 0, y: -1 },
+  down: { x: 0, y: 1 },
+  left: { x: -1, y: 0 },
+  right: { x: 1, y: 0 },
+};
+
+class Player {
+  /**
+   * @param {number} x - posição inicial em pixels (mundo)
+   * @param {number} y
+   * @param {Grid} grid - referência ao mundo, para consultas de colisão
+   * @param {object} opts - { color, footSpeed, cycleSpeed, radius }
+   */
+  constructor(x, y, grid, opts = {}) {
+    this.grid = grid;
+    this.x = x;
+    this.y = y;
+    this.radius = opts.radius ?? 11;
+    this.footSpeed = opts.footSpeed ?? 220;   // px/s a pé
+    this.cycleSpeed = opts.cycleSpeed ?? 340; // px/s de moto
+    this.color = opts.color ?? '#5ef4ff';
+
+    this.mode = PLAYER_MODE.FOOT;
+    this.facing = { x: 0, y: 1 }; // direção que o personagem está olhando (a pé)
+
+    // --- estado do Light Cycle ---
+    this.cycleDir = DIRS.right;   // direção atual da moto
+    this.nextDir = null;          // direção pedida pelo jogador, aplicada no próximo tile
+    this.trail = [];              // lista de {col,row} ocupados pelo rastro de luz
+    this._lastTrailCell = null;
+    this.crashed = false;
+    this.spawn = { x, y };
+
+    this.onCrash = opts.onCrash ?? null; // callback opcional(player)
+  }
+
+  /* ---------------------------------------------------------- */
+  /* CONTROLE DE MODO                                             */
+  /* ---------------------------------------------------------- */
+
+  toggleMode() {
+    if (this.mode === PLAYER_MODE.FOOT) {
+      this._enterCycleMode();
+    } else {
+      this._exitCycleMode();
+    }
+  }
+
+  _enterCycleMode() {
+    // alinha a posição ao centro do tile mais próximo, pra manter o grid-lock
+    const { tileSize } = this.grid;
+    const { col, row } = this.grid.worldToTile(this.x, this.y);
+    this.x = col * tileSize + tileSize / 2;
+    this.y = row * tileSize + tileSize / 2;
+
+    this.mode = PLAYER_MODE.CYCLE;
+    this.cycleDir = this._facingToCardinal();
+    this.nextDir = null;
+    this.trail = [];
+    this._lastTrailCell = { col, row };
+    this.trail.push({ col, row });
+    this.crashed = false;
+  }
+
+  _exitCycleMode() {
+    this.mode = PLAYER_MODE.FOOT;
+    this.trail = [];
+    this._lastTrailCell = null;
+  }
+
+  _facingToCardinal() {
+    if (Math.abs(this.facing.x) > Math.abs(this.facing.y)) {
+      return this.facing.x > 0 ? DIRS.right : DIRS.left;
+    }
+    return this.facing.y > 0 ? DIRS.down : DIRS.up;
+  }
+
+  /** Reseta o personagem no ponto de spawn após uma colisão. */
+  respawn() {
+    this.x = this.spawn.x;
+    this.y = this.spawn.y;
+    this.trail = [];
+    this._lastTrailCell = null;
+    this.crashed = false;
+    this.mode = PLAYER_MODE.FOOT;
+  }
+
+  /* ---------------------------------------------------------- */
+  /* ATUALIZAÇÃO                                                  */
+  /* ---------------------------------------------------------- */
+
+  /**
+   * @param {number} dt - delta time em segundos
+   * @param {object} keys - mapa de teclas pressionadas (main.js)
+   */
+  update(dt, keys) {
+    if (this.crashed) return;
+
+    if (this.mode === PLAYER_MODE.FOOT) {
+      this._updateFoot(dt, keys);
+    } else {
+      this._readCycleInput(keys);
+      this._updateCycle(dt);
+    }
+  }
+
+  _updateFoot(dt, keys) {
+    let dx = 0, dy = 0;
+    if (keys['arrowup'] || keys['w']) dy -= 1;
+    if (keys['arrowdown'] || keys['s']) dy += 1;
+    if (keys['arrowleft'] || keys['a']) dx -= 1;
+    if (keys['arrowright'] || keys['d']) dx += 1;
+
+    if (dx === 0 && dy === 0) return;
+
+    if (dx !== 0 && dy !== 0) {
+      const inv = Math.SQRT1_2;
+      dx *= inv; dy *= inv;
+    }
+    this.facing = { x: dx, y: dy };
+
+    const nx = this.x + dx * this.footSpeed * dt;
+    const ny = this.y + dy * this.footSpeed * dt;
+
+    // testa colisão nos 4 pontos da "borda" do personagem, eixo a eixo
+    if (this._canStandAt(nx, this.y)) this.x = nx;
+    if (this._canStandAt(this.x, ny)) this.y = ny;
+  }
+
+  _canStandAt(x, y) {
+    const r = this.radius;
+    return (
+      this.grid.isWalkable(x - r, y - r) &&
+      this.grid.isWalkable(x + r, y - r) &&
+      this.grid.isWalkable(x - r, y + r) &&
+      this.grid.isWalkable(x + r, y + r)
+    );
+  }
+
+  _readCycleInput(keys) {
+    // pressionar uma direção define a próxima curva; ignora reversão de 180°
+    let requested = null;
+    if (keys['arrowup'] || keys['w']) requested = DIRS.up;
+    else if (keys['arrowdown'] || keys['s']) requested = DIRS.down;
+    else if (keys['arrowleft'] || keys['a']) requested = DIRS.left;
+    else if (keys['arrowright'] || keys['d']) requested = DIRS.right;
+
+    if (!requested) return;
+    const isReverse =
+      requested.x === -this.cycleDir.x && requested.y === -this.cycleDir.y;
+    if (!isReverse) this.nextDir = requested;
+  }
+
+  _updateCycle(dt) {
+    const { tileSize } = this.grid;
+
+    // aplica a curva pendente somente quando alinhado ao centro do tile atual
+    if (this.nextDir) {
+      const { col, row } = this.grid.worldToTile(this.x, this.y);
+      const cx = col * tileSize + tileSize / 2;
+      const cy = row * tileSize + tileSize / 2;
+      const aligned = Math.abs(this.x - cx) < 2 && Math.abs(this.y - cy) < 2;
+      if (aligned) {
+        this.cycleDir = this.nextDir;
+        this.nextDir = null;
+      }
+    }
+
+    this.x += this.cycleDir.x * this.cycleSpeed * dt;
+    this.y += this.cycleDir.y * this.cycleSpeed * dt;
+    this.facing = this.cycleDir;
+
+    // registra célula de rastro ao entrar em um novo tile
+    const cell = this.grid.worldToTile(this.x, this.y);
+    const last = this._lastTrailCell;
+    if (!last || cell.col !== last.col || cell.row !== last.row) {
+      this.trail.push({ col: cell.col, row: cell.row });
+      this._lastTrailCell = cell;
+    }
+
+    this._checkCycleCrash(cell);
+  }
+
+  _checkCycleCrash(cell) {
+    // colidiu com barreira do grid?
+    if (this.grid.getTile(cell.col, cell.row) === window.TILE.WALL) {
+      this._crash();
+      return;
+    }
+    // colidiu com o próprio rastro (ignora a célula mais recente, que é a atual)
+    for (let i = 0; i < this.trail.length - 1; i++) {
+      const t = this.trail[i];
+      if (t.col === cell.col && t.row === cell.row) {
+        this._crash();
+        return;
+      }
+    }
+  }
+
+  _crash() {
+    this.crashed = true;
+    if (this.onCrash) this.onCrash(this);
+  }
+
+  /* ---------------------------------------------------------- */
+  /* RENDERIZAÇÃO                                                 */
+  /* ---------------------------------------------------------- */
+
+  render(ctx, camera) {
+    if (this.mode === PLAYER_MODE.CYCLE) {
+      this._renderTrail(ctx, camera);
+      this._renderCycle(ctx, camera);
+    } else {
+      this._renderFoot(ctx, camera);
+    }
+  }
+
+  _renderFoot(ctx, camera) {
+    const sx = this.x - camera.x;
+    const sy = this.y - camera.y;
+
+    ctx.save();
+    ctx.shadowColor = this.color;
+    ctx.shadowBlur = 14;
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(sx, sy, this.radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // indicador de direção (facing)
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(sx, sy);
+    ctx.lineTo(sx + this.facing.x * this.radius * 1.6, sy + this.facing.y * this.radius * 1.6);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  _renderCycle(ctx, camera) {
+    const sx = this.x - camera.x;
+    const sy = this.y - camera.y;
+    const angle = Math.atan2(this.facing.y, this.facing.x);
+
+    ctx.save();
+    ctx.translate(sx, sy);
+    ctx.rotate(angle);
+    ctx.shadowColor = this.crashed ? '#ff3b3b' : this.color;
+    ctx.shadowBlur = 16;
+    ctx.fillStyle = this.crashed ? '#ff3b3b' : this.color;
+    ctx.beginPath();
+    ctx.moveTo(16, 0);
+    ctx.lineTo(-12, -8);
+    ctx.lineTo(-6, 0);
+    ctx.lineTo(-12, 8);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  _renderTrail(ctx, camera) {
+    if (this.trail.length < 2) return;
+    const { tileSize } = this.grid;
+
+    ctx.save();
+    ctx.shadowColor = this.color;
+    ctx.shadowBlur = 10;
+    ctx.strokeStyle = this.color;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    this.trail.forEach((cell, i) => {
+      const px = cell.col * tileSize + tileSize / 2 - camera.x;
+      const py = cell.row * tileSize + tileSize / 2 - camera.y;
+      if (i === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    });
+    // conecta até a posição atual (suaviza o segmento em progresso)
+    ctx.lineTo(this.x - camera.x, this.y - camera.y);
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+window.PLAYER_MODE = PLAYER_MODE;
+window.Player = Player;
+
+</script>
+<script>
+/**
+ * main.js
+ * ---------------------------------------------------------------
+ * Ponto de entrada do protótipo. Monta o canvas, cria o Grid e o
+ * Player, e roda o loop principal com a câmera seguindo o
+ * personagem. Alterna entre modo a pé e Light Cycle com [E].
+ * ---------------------------------------------------------------
+ */
+
+(function () {
+  const canvas = document.getElementById('game-canvas');
+  const ctx = canvas.getContext('2d');
+  const coordsEl = document.getElementById('hud-coords');
+  const fpsEl = document.getElementById('hud-fps');
+  const modeEl = document.getElementById('hud-mode');
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // --- mundo (usa a matriz fixa MAP_LAYOUT definida em grid.js) ---
+  const grid = new Grid(40);
+  const spawn = grid.spawnPoints[0];
+
+  // --- personagem ---
+  const player = new Player(
+    spawn.x + grid.tileSize / 2,
+    spawn.y + grid.tileSize / 2,
+    grid,
+    {
+      color: '#5ef4ff',
+      onCrash: () => {
+        // pequena pausa visual antes de reposicionar no spawn
+        setTimeout(() => player.respawn(), 700);
+      },
+    }
+  );
+
+  // --- câmera (segue o player, travada nos limites do mundo) ---
+  const camera = { x: 0, y: 0, width: canvas.width, height: canvas.height };
+
+  function updateCamera() {
+    camera.width = canvas.width;
+    camera.height = canvas.height;
+    camera.x = player.x - camera.width / 2;
+    camera.y = player.y - camera.height / 2;
+    camera.x = Math.max(0, Math.min(camera.x, grid.pixelWidth - camera.width));
+    camera.y = Math.max(0, Math.min(camera.y, grid.pixelHeight - camera.height));
+  }
+
+  // --- input ---
+  const keys = {};
+  window.addEventListener('keydown', (e) => {
+    const k = e.key.toLowerCase();
+    keys[k] = true;
+    if (k === 'e') player.toggleMode();
+  });
+  window.addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; });
+
+  // --- loop principal ---
+  let last = performance.now();
+  let fpsFrames = 0, fpsTimer = 0;
+
+  function loop(now) {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+
+    player.update(dt, keys);
+    updateCamera();
+
+    grid.render(ctx, camera, dt);
+    player.render(ctx, camera);
+
+    // HUD
+    const { col, row } = grid.worldToTile(player.x, player.y);
+    coordsEl.textContent = `SETOR ${col.toString().padStart(2, '0')}:${row.toString().padStart(2, '0')}`;
+    modeEl.textContent = player.mode === PLAYER_MODE.CYCLE
+      ? (player.crashed ? '⚠ COLISÃO — REINICIANDO' : '⛭ LIGHT CYCLE')
+      : '◈ A PÉ';
+    modeEl.className = player.crashed ? 'hud-mode crashed' : 'hud-mode';
+
+    fpsFrames++; fpsTimer += dt;
+    if (fpsTimer >= 0.5) {
+      fpsEl.textContent = `${Math.round(fpsFrames / fpsTimer)} FPS`;
+      fpsFrames = 0; fpsTimer = 0;
+    }
+
+    requestAnimationFrame(loop);
+  }
+
+  requestAnimationFrame(loop);
+})();
+
+</script>
+</body>
+</html>
