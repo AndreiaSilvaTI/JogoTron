@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>THE GRID // audio synth</title>
+<style>
+  :root{
+    --void:#050a0f;
+    --void2:#0a1420;
+    --cyan:#5ef4ff;
+    --cyan-dim:#1e5a66;
+    --orange:#ff8a3d;
+    --white:#eafcff;
+    --line:#123340;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse at 50% 0%, #0c1d2a 0%, var(--void) 60%),
+      var(--void);
+    color:var(--white);
+    font-family:'Consolas','Courier New',monospace;
+    min-height:100vh;
+    padding:40px 20px 60px;
+    overflow-x:hidden;
+  }
+  .bg-grid{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:48px 48px;
+    -webkit-mask-image:radial-gradient(ellipse at 50% 30%, black 0%, transparent 75%);
+    mask-image:radial-gradient(ellipse at 50% 30%, black 0%, transparent 75%);
+    opacity:.5;
+  }
+  .wrap{position:relative; z-index:1; max-width:760px; margin:0 auto;}
+
+  header{text-align:center; margin-bottom:44px;}
+  .eyebrow{
+    letter-spacing:.4em; font-size:11px; color:var(--cyan-dim);
+    text-transform:uppercase; margin-bottom:10px;
+  }
+  h1{
+    font-size:clamp(28px,6vw,46px);
+    margin:0; letter-spacing:.15em; font-weight:700;
+    color:var(--white);
+    text-shadow:0 0 6px var(--cyan), 0 0 22px rgba(94,244,255,.35);
+  }
+  h1 span{color:var(--orange); text-shadow:0 0 6px var(--orange), 0 0 22px rgba(255,138,61,.35);}
+  .sub{color:#6fa8b3; font-size:13px; margin-top:12px; letter-spacing:.03em;}
+
+  .panel{
+    border:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(20,45,58,.35), rgba(10,20,30,.25));
+    border-radius:2px;
+    padding:22px;
+    margin-bottom:22px;
+    position:relative;
+  }
+  .panel::before{
+    content:attr(data-tag);
+    position:absolute; top:-11px; left:16px;
+    background:var(--void); padding:0 8px;
+    font-size:10px; letter-spacing:.3em; color:var(--cyan);
+    text-transform:uppercase;
+  }
+  .panel-title{font-size:14px; letter-spacing:.06em; color:var(--white); margin:2px 0 16px 0; opacity:.85;}
+
+  .grid-buttons{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  @media(max-width:520px){.grid-buttons{grid-template-columns:1fr;}}
+
+  button.fx{
+    appearance:none; cursor:pointer;
+    background:var(--void2);
+    border:1px solid var(--cyan-dim);
+    color:var(--cyan);
+    padding:16px 14px;
+    font-family:inherit;
+    font-size:13px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    border-radius:1px;
+    text-align:left;
+    display:flex; align-items:center; justify-content:space-between;
+    transition:background .15s, box-shadow .15s, transform .05s, border-color .15s;
+  }
+  button.fx small{display:block; font-size:10px; color:#5a8790; letter-spacing:.05em; margin-top:4px; text-transform:none;}
+  button.fx:hover{
+    border-color:var(--cyan);
+    box-shadow:0 0 14px rgba(94,244,255,.25), inset 0 0 14px rgba(94,244,255,.06);
+  }
+  button.fx:active{transform:scale(.98);}
+  button.fx.playing{
+    background:rgba(94,244,255,.09);
+    box-shadow:0 0 18px rgba(94,244,255,.4), inset 0 0 18px rgba(94,244,255,.12);
+  }
+  button.fx .ico{font-size:18px; margin-left:10px; flex-shrink:0;}
+
+  /* moto control */
+  .moto-row{display:flex; flex-direction:column; gap:14px;}
+  .moto-btn{
+    appearance:none; cursor:pointer;
+    background:linear-gradient(180deg, rgba(255,138,61,.08), rgba(255,138,61,.02));
+    border:1px solid #7a4720;
+    color:var(--orange);
+    padding:18px;
+    font-family:inherit; font-size:14px; letter-spacing:.1em; text-transform:uppercase;
+    display:flex; align-items:center; justify-content:space-between;
+    transition:box-shadow .15s, border-color .15s;
+  }
+  .moto-btn:hover{border-color:var(--orange); box-shadow:0 0 14px rgba(255,138,61,.3);}
+  .moto-btn.playing{box-shadow:0 0 20px rgba(255,138,61,.5), inset 0 0 18px rgba(255,138,61,.15);}
+  .meter{
+    height:6px; background:#1a0f08; border:1px solid #7a4720; overflow:hidden;
+  }
+  .meter-fill{height:100%; width:0%; background:linear-gradient(90deg,#ff8a3d,#ffd23d); transition:width .1s linear;}
+
+  /* pad section */
+  .pad-controls{display:flex; gap:12px; align-items:center; flex-wrap:wrap;}
+  .toggle{
+    appearance:none; cursor:pointer;
+    background:var(--void2); border:1px solid var(--cyan-dim); color:var(--cyan);
+    padding:14px 20px; font-family:inherit; font-size:13px; letter-spacing:.1em; text-transform:uppercase;
+    flex:1; min-width:160px; text-align:center;
+  }
+  .toggle.on{background:rgba(94,244,255,.12); box-shadow:0 0 18px rgba(94,244,255,.35); border-color:var(--cyan);}
+  .slider-row{display:flex; align-items:center; gap:10px; font-size:11px; color:#6fa8b3; letter-spacing:.05em; margin-top:14px;}
+  .slider-row input[type=range]{flex:1; accent-color:var(--cyan);}
+
+  footer{text-align:center; margin-top:36px; font-size:11px; color:#3d6068; letter-spacing:.06em; line-height:1.7;}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">End of Line</div>
+    <h1>THE <span>GRID</span> // AUDIO SYNTH</h1>
+    <div class="sub">Efeitos sonoros gerados em tempo real via Web Audio API — nenhum áudio original do filme é utilizado.</div>
+  </header>
+
+  <div class="panel" data-tag="Combate">
+    <div class="panel-title">⟢ Discos de Identidade</div>
+    <div class="grid-buttons">
+      <button class="fx" id="btn-laser">
+        <span>Golpe de Disco<small>impacto + zumbido de energia</small></span>
+        <span class="ico">◈</span>
+      </button>
+      <button class="fx" id="btn-throw">
+        <span>Arremesso de Disco<small>lançamento com efeito doppler</small></span>
+        <span class="ico">↗</span>
+      </button>
+      <button class="fx" id="btn-derez">
+        <span>Derez (Desintegração)<small>colapso de programa</small></span>
+        <span class="ico">✕</span>
+      </button>
+      <button class="fx" id="btn-portal">
+        <span>Portal / Digitalização<small>varredura de laser vertical</small></span>
+        <span class="ico">▮</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="panel" data-tag="Veículo">
+    <div class="panel-title">⟢ Moto de Luz</div>
+    <div class="moto-row">
+      <button class="moto-btn" id="btn-moto">
+        <span>Segurar para acelerar</span>
+        <span id="moto-label">▸ PARADA</span>
+      </button>
+      <div class="meter"><div class="meter-fill" id="moto-meter"></div></div>
+    </div>
+  </div>
+
+  <div class="panel" data-tag="Ambiente">
+    <div class="panel-title">⟢ Trilha Sonora do Grid</div>
+    <div class="pad-controls">
+      <button class="toggle" id="btn-pad">▶ Iniciar pad synthwave</button>
+    </div>
+    <div class="slider-row">
+      <span>TOM</span>
+      <input type="range" id="pad-tone" min="0" max="100" value="50">
+      <span>BRILHO</span>
+    </div>
+  </div>
+
+  <footer>
+    Todos os sons são sintetizados via osciladores e ruído filtrado — nada aqui é extraído de nenhuma fonte protegida.<br>
+    Toque os fones de ouvido, programa.
+  </footer>
+</div>
+
+<script>
+let actx = null;
+function ctx(){
+  if(!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+  if(actx.state === 'suspended') actx.resume();
+  return actx;
+}
+
+function envGain(ac, node, t0, attack, hold, release, peak){
+  const g = ac.createGain();
+  node.connect(g);
+  g.gain.setValueAtTime(0, t0);
+  g.gain.linearRampToValueAtTime(peak, t0+attack);
+  g.gain.setValueAtTime(peak, t0+attack+hold);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0+attack+hold+release);
+  return g;
+}
+
+function noiseBuffer(ac, dur){
+  const buf = ac.createBuffer(1, ac.sampleRate*dur, ac.sampleRate);
+  const d = buf.getChannelData(0);
+  for(let i=0;i<d.length;i++) d[i] = Math.random()*2-1;
+  return buf;
+}
+
+/* ---- Golpe de disco: impacto metálico + zap de energia ---- */
+function playLaser(){
+  const ac = ctx(); const t0 = ac.currentTime;
+  // impacto (ruído filtrado curto)
+  const src = ac.createBufferSource();
+  src.buffer = noiseBuffer(ac, 0.3);
+  const bp = ac.createBiquadFilter();
+  bp.type='bandpass'; bp.frequency.setValueAtTime(1800,t0); bp.Q.value=6;
+  const g1 = envGain(ac, bp, t0, 0.002, 0.02, 0.15, 0.5);
+  src.connect(bp); g1.connect(ac.destination);
+  src.start(t0); src.stop(t0+0.3);
+
+  // zap descendente
+  const osc = ac.createOscillator();
+  osc.type='sawtooth';
+  osc.frequency.setValueAtTime(2200,t0);
+  osc.frequency.exponentialRampToValueAtTime(140, t0+0.28);
+  const g2 = envGain(ac, osc, t0, 0.001, 0.02, 0.26, 0.35);
+  osc.connect(g2); g2.connect(ac.destination);
+  osc.start(t0); osc.stop(t0+0.32);
+}
+
+/* ---- Arremesso: sibilo com pitch subindo e doppler ---- */
+function playThrow(){
+  const ac = ctx(); const t0 = ac.currentTime;
+  const osc = ac.createOscillator();
+  osc.type='square';
+  osc.frequency.setValueAtTime(400,t0);
+  osc.frequency.linearRampToValueAtTime(1400, t0+0.18);
+  osc.frequency.linearRampToValueAtTime(200, t0+0.45);
+  const filt = ac.createBiquadFilter();
+  filt.type='bandpass'; filt.frequency.setValueAtTime(900,t0); filt.Q.value=3;
+  const g = envGain(ac, filt, t0, 0.01, 0.25, 0.2, 0.3);
+  osc.connect(filt); g.connect(ac.destination);
+  osc.start(t0); osc.stop(t0+0.5);
+}
+
+/* ---- Derez: colapso digital, ruído com filtro caindo ---- */
+function playDerez(){
+  const ac = ctx(); const t0 = ac.currentTime;
+  const src = ac.createBufferSource();
+  src.buffer = noiseBuffer(ac, 0.6);
+  const filt = ac.createBiquadFilter();
+  filt.type='lowpass';
+  filt.frequency.setValueAtTime(4000,t0);
+  filt.frequency.exponentialRampToValueAtTime(80, t0+0.55);
+  const g = envGain(ac, filt, t0, 0.005, 0.1, 0.5, 0.4);
+  src.connect(filt); g.connect(ac.destination);
+  src.start(t0); src.stop(t0+0.6);
+
+  const osc = ac.createOscillator();
+  osc.type='sine';
+  osc.frequency.setValueAtTime(800,t0);
+  osc.frequency.exponentialRampToValueAtTime(40, t0+0.5);
+  const g2 = envGain(ac, osc, t0, 0.005, 0.05, 0.45, 0.25);
+  osc.connect(g2); g2.connect(ac.destination);
+  osc.start(t0); osc.stop(t0+0.55);
+}
+
+/* ---- Portal / digitalização: varredura ascendente ---- */
+function playPortal(){
+  const ac = ctx(); const t0 = ac.currentTime;
+  for(let i=0;i<3;i++){
+    const osc = ac.createOscillator();
+    osc.type='sine';
+    const start = 150 + i*40;
+    osc.frequency.setValueAtTime(start, t0+i*0.03);
+    osc.frequency.exponentialRampToValueAtTime(start*9, t0+i*0.03+0.5);
+    const g = envGain(ac, osc, t0+i*0.03, 0.02, 0.3, 0.25, 0.15);
+    osc.connect(g); g.connect(ac.destination);
+    osc.start(t0+i*0.03); osc.stop(t0+i*0.03+0.6);
+  }
+}
+
+/* ---- Moto de Luz: motor contínuo enquanto segura o botão ---- */
+let motoNodes = null;
+let motoRAF = null;
+let motoLevel = 0;
+
+function startMoto(){
+  const ac = ctx();
+  const osc1 = ac.createOscillator(); osc1.type='sawtooth'; osc1.frequency.value=60;
+  const osc2 = ac.createOscillator(); osc2.type='square'; osc2.frequency.value=61.5;
+  const filt = ac.createBiquadFilter(); filt.type='lowpass'; filt.frequency.value=300;
+  const g = ac.createGain(); g.gain.value=0.0001;
+  osc1.connect(filt); osc2.connect(filt); filt.connect(g); g.connect(ac.destination);
+  osc1.start(); osc2.start();
+  motoNodes = {osc1,osc2,filt,g,ac};
+
+  const btn = document.getElementById('btn-moto');
+  const label = document.getElementById('moto-label');
+  const meter = document.getElementById('moto-meter');
+  btn.classList.add('playing');
+
+  function ramp(){
+    motoLevel = Math.min(1, motoLevel + 0.02);
+    applyMotoLevel();
+    meter.style.width = (motoLevel*100)+'%';
+    label.textContent = motoLevel > 0.95 ? '▸ VELOCIDADE MÁXIMA' : '▸ ACELERANDO';
+    motoRAF = requestAnimationFrame(ramp);
+  }
+  ramp();
+}
+
+function applyMotoLevel(){
+  if(!motoNodes) return;
+  const {osc1,osc2,filt,g,ac} = motoNodes;
+  const t = ac.currentTime;
+  const freq = 55 + motoLevel*260;
+  osc1.frequency.setTargetAtTime(freq, t, 0.05);
+  osc2.frequency.setTargetAtTime(freq*1.02, t, 0.05);
+  filt.frequency.setTargetAtTime(300 + motoLevel*3000, t, 0.05);
+  g.gain.setTargetAtTime(0.15 + motoLevel*0.12, t, 0.05);
+}
+
+function stopMoto(){
+  if(motoRAF) cancelAnimationFrame(motoRAF);
+  const btn = document.getElementById('btn-moto');
+  const label = document.getElementById('moto-label');
+  const meter = document.getElementById('moto-meter');
+  btn.classList.remove('playing');
+  label.textContent = '▸ PARADA';
+
+  function decay(){
+    motoLevel = Math.max(0, motoLevel - 0.03);
+    applyMotoLevel();
+    meter.style.width = (motoLevel*100)+'%';
+    if(motoLevel > 0){
+      requestAnimationFrame(decay);
+    } else if(motoNodes){
+      const {osc1,osc2,ac} = motoNodes;
+      const t = ac.currentTime;
+      osc1.stop(t+0.05); osc2.stop(t+0.05);
+      motoNodes = null;
+    }
+  }
+  decay();
+}
+
+/* ---- Pad synthwave ambiente ---- */
+let padNodes = null;
+function startPad(){
+  const ac = ctx();
+  const notes = [55, 82.41, 110, 130.81]; // A1, E2, A2, C3 -ish, drone
+  const master = ac.createGain(); master.gain.value=0.0001;
+  master.connect(ac.destination);
+  master.gain.linearRampToValueAtTime(0.12, ac.currentTime+1.5);
+
+  const filt = ac.createBiquadFilter();
+  filt.type='lowpass'; filt.frequency.value=800;
+  filt.connect(master);
+
+  const lfo = ac.createOscillator(); lfo.type='sine'; lfo.frequency.value=0.08;
+  const lfoGain = ac.createGain(); lfoGain.gain.value=300;
+  lfo.connect(lfoGain); lfoGain.connect(filt.frequency);
+  lfo.start();
+
+  const oscs = notes.map((f,i)=>{
+    const o = ac.createOscillator();
+    o.type = i%2===0 ? 'sawtooth' : 'triangle';
+    o.frequency.value = f;
+    o.detune.value = (i-1.5)*4;
+    o.connect(filt);
+    o.start();
+    return o;
+  });
+
+  padNodes = {master, filt, lfo, oscs, ac};
+}
+function stopPad(){
+  if(!padNodes) return;
+  const {master, lfo, oscs, ac} = padNodes;
+  const t = ac.currentTime;
+  master.gain.linearRampToValueAtTime(0.0001, t+0.8);
+  setTimeout(()=>{
+    oscs.forEach(o=>o.stop());
+    lfo.stop();
+  }, 850);
+  padNodes = null;
+}
+
+/* ---- wiring ---- */
+function flashBtn(id){
+  const b = document.getElementById(id);
+  b.classList.add('playing');
+  setTimeout(()=>b.classList.remove('playing'), 260);
+}
+
+document.getElementById('btn-laser').addEventListener('click', ()=>{playLaser(); flashBtn('btn-laser');});
+document.getElementById('btn-throw').addEventListener('click', ()=>{playThrow(); flashBtn('btn-throw');});
+document.getElementById('btn-derez').addEventListener('click', ()=>{playDerez(); flashBtn('btn-derez');});
+document.getElementById('btn-portal').addEventListener('click', ()=>{playPortal(); flashBtn('btn-portal');});
+
+const motoBtn = document.getElementById('btn-moto');
+motoBtn.addEventListener('mousedown', startMoto);
+motoBtn.addEventListener('touchstart', (e)=>{e.preventDefault(); startMoto();});
+motoBtn.addEventListener('mouseup', stopMoto);
+motoBtn.addEventListener('mouseleave', ()=>{ if(motoNodes) stopMoto(); });
+motoBtn.addEventListener('touchend', stopMoto);
+
+const padBtn = document.getElementById('btn-pad');
+let padOn = false;
+padBtn.addEventListener('click', ()=>{
+  padOn = !padOn;
+  if(padOn){ startPad(); padBtn.textContent='■ Parar pad'; padBtn.classList.add('on'); }
+  else{ stopPad(); padBtn.textContent='▶ Iniciar pad synthwave'; padBtn.classList.remove('on'); }
+});
+
+document.getElementById('pad-tone').addEventListener('input', (e)=>{
+  if(padNodes){
+    const v = e.target.value/100;
+    padNodes.filt.frequency.setTargetAtTime(400 + v*2600, padNodes.ac.currentTime, 0.1);
+  }
+});
+</script>
+</body>
+</html>
