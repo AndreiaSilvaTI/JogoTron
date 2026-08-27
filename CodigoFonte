@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRON // GRID CITY COMBAT</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div id="game-container">
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="hud">
+      <div id="hud-vida" class="hud-barra">
+        <span class="hud-label">VIDA</span>
+        <div class="barra-fundo"><div id="barra-vida" class="barra-preenchimento barra-vida-cor"></div></div>
+      </div>
+      <div id="hud-energia" class="hud-barra">
+        <span class="hud-label">DISCO</span>
+        <div class="barra-fundo"><div id="barra-energia" class="barra-preenchimento barra-energia-cor"></div></div>
+      </div>
+    </div>
+
+    <div id="tela-menu" class="tela-overlay">
+      <h1 class="titulo-tron">TRON</h1>
+      <p class="subtitulo-tron">// RUN TO THE PORTAL // </p>
+      <button id="btn-iniciar" class="botao-tron">ENTRAR NO GRID</button>
+
+      <div class="painel-controles">
+        <div class="linha-controle">
+          <div class="teclado-grid">
+            <div></div><div class="tecla">▲</div><div></div>
+            <div class="tecla">◄</div><div class="tecla">▼</div><div class="tecla">►</div>
+          </div>
+          <span>— MOVER LIGHT CYCLE</span>
+        </div>
+
+        <div class="linha-controle">
+          <div class="tecla-espaco">ESPAÇO</div>
+          <span>— ARREMPASSAR DISCO</span>
+        </div>
+
+        <div class="linha-controle">
+          <span class="badge-gps">PORTAL</span>
+          <span>— CHEGUE AO FEIXE DE LUZ GIGANTE PARA RETORNAR</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="tela-derrota" class="tela-overlay escondido">
+      <h1 class="titulo-tron titulo-derrota">DESCONECTADO</h1>
+      <p class="subtitulo-tron">Seu Light Cycle foi destruído no Grid.</p>
+      <button id="btn-reiniciar-derrota" class="botao-tron botao-derrota">REINICIAR JOGO</button>
+    </div>
+
+    <div id="tela-vitoria" class="tela-overlay escondido">
+      <h1 class="titulo-tron titulo-vitoria">SISTEMA ESCAPADO</h1>
+      <p class="subtitulo-tron">Você alcançou o Portal e retornou ao mundo real.</p>
+      <button id="btn-reiniciar-vitoria" class="botao-tron">JOGAR NOVAMENTE</button>
+    </div>
+  </div>
+
+  <!-- Inclusão dos Scripts em ordem de dependência -->
+  <script src="js/sons.js"></script>
+  <script src="js/grid.js"></script>
+  <script src="js/armas.js"></script>
+  <script src="js/personagens.js"></script>
+  <script src="js/inimigos.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
