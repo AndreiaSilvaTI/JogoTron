@@ -28,15 +28,4 @@ site do personagem: https://liberatedpixelcup.github.io/Universal-LPC-Spriteshee
 fazer o mapa e criar a pasta dos sprites
 
 
-meu-jogo-tron/
-├── css/
-│   └── style.css
-├── js/
-│   ├── sons.js
-│   ├── grid.js
-│   ├── armas.js
-│   ├── personagens.js
-│   ├── inimigos.js
-│   └── main.js
-└── Jogo Tron - Codigo Fonte.html
 
