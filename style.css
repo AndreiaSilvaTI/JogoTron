@@ -1,0 +1,224 @@
+:root {
+  --azul-neon: #4de3ff;
+  --azul-neon-escuro: #0f7a99;
+  --laranja-neon: #ff9331;
+  --preto-grid: #030710;
+  --vermelho-alerta: #ff3b3b;
+  --fonte-tron: 'Orbitron', 'Courier New', monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: var(--preto-grid);
+  overflow: hidden;
+  font-family: var(--fonte-tron);
+}
+
+#game-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: var(--preto-grid);
+}
+
+#gameCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--preto-grid);
+}
+
+.escondido {
+  display: none !important;
+}
+
+#hud {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.hud-barra {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hud-label {
+  color: var(--azul-neon);
+  font-size: 12px;
+  letter-spacing: 2px;
+  width: 70px;
+  text-shadow: 0 0 6px var(--azul-neon);
+}
+
+.barra-fundo {
+  width: 200px;
+  height: 14px;
+  background: rgba(10, 20, 30, 0.8);
+  border: 1px solid var(--azul-neon-escuro);
+  box-shadow: 0 0 8px rgba(77, 227, 255, 0.3);
+}
+
+.barra-preenchimento {
+  height: 100%;
+  width: 100%;
+  transition: width 0.15s ease-out;
+}
+
+.barra-vida-cor {
+  background: linear-gradient(90deg, #ff3b3b, #ff8a4d);
+  box-shadow: 0 0 10px #ff5b3b;
+}
+
+.barra-energia-cor {
+  background: linear-gradient(90deg, var(--azul-neon-escuro), var(--azul-neon));
+  box-shadow: 0 0 10px var(--azul-neon);
+}
+
+.tela-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: rgba(3, 7, 16, 0.92);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  text-align: center;
+}
+
+.titulo-tron {
+  font-size: 56px;
+  font-weight: 900;
+  letter-spacing: 12px;
+  color: var(--azul-neon);
+  text-shadow: 0 0 12px var(--azul-neon), 0 0 40px var(--azul-neon-escuro);
+}
+
+.titulo-derrota {
+  color: var(--vermelho-alerta);
+  text-shadow: 0 0 12px var(--vermelho-alerta), 0 0 40px #7a0f0f;
+  font-size: 48px;
+  letter-spacing: 8px;
+}
+
+.titulo-vitoria {
+  color: #3bff5b;
+  text-shadow: 0 0 12px #3bff5b, 0 0 40px #0f7a28;
+  font-size: 40px;
+  letter-spacing: 8px;
+}
+
+.subtitulo-tron {
+  color: var(--azul-neon-escuro);
+  letter-spacing: 4px;
+  font-size: 13px;
+}
+
+.botao-tron {
+  margin-top: 10px;
+  padding: 14px 36px;
+  background: transparent;
+  color: var(--azul-neon);
+  border: 2px solid var(--azul-neon);
+  font-family: var(--fonte-tron);
+  font-size: 15px;
+  letter-spacing: 3px;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(77, 227, 255, 0.4);
+  transition: all 0.2s ease;
+}
+
+.botao-tron:hover {
+  background: var(--azul-neon);
+  color: var(--preto-grid);
+  box-shadow: 0 0 25px var(--azul-neon);
+}
+
+.botao-derrota {
+  color: var(--vermelho-alerta);
+  border-color: var(--vermelho-alerta);
+  box-shadow: 0 0 10px rgba(255, 59, 59, 0.4);
+}
+
+.botao-derrota:hover {
+  background: var(--vermelho-alerta);
+  color: var(--preto-grid);
+  box-shadow: 0 0 25px var(--vermelho-alerta);
+}
+
+.painel-controles {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.linha-controle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--azul-neon);
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.teclado-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 26px);
+  grid-template-rows: repeat(2, 26px);
+  gap: 4px;
+}
+
+.tecla {
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--laranja-neon);
+  color: var(--laranja-neon);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  background: rgba(255, 147, 49, 0.08);
+}
+
+.tecla-espaco {
+  width: 90px;
+  height: 26px;
+  border: 1px solid var(--laranja-neon);
+  color: var(--laranja-neon);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  letter-spacing: 1px;
+  background: rgba(255, 147, 49, 0.08);
+}
+
+.badge-gps {
+  padding: 4px 10px;
+  border: 1px solid var(--vermelho-alerta);
+  color: var(--vermelho-alerta);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: bold;
+  background: rgba(255, 59, 59, 0.1);
+}
