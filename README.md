@@ -24,7 +24,7 @@ Projeto de jogo 2D desenvolvido em HTML5 Canvas e JavaScript modularizado, inspi
 ## 📁 Estrutura de Arquivos do Projeto
 
 ```text
-meu-jogo-tron/
+Jogo-Tron/
 ├── css/
 │   └── style.css            # Estilos visuais, variáveis neon e HUD
 ├── js/
