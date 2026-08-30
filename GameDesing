@@ -72,6 +72,20 @@ As motocicletas digitais podem ser utilizadas para exploração, corridas e bata
 Como funciona
 Durante a condução, a moto gera paredes de luz que podem destruir inimigos ou bloquear seus movimentos.
 
+***Mecânica do jogo (prompts):***
+*Controles:
+-WASD / Setas: Movimentam o Personagem Light Cycle (moto).
+-Espaço: dispara o disco de luz.
+-Destino: Portal de Luz, que leva para o Mundo Real.
+*Regras:
+-Se colidir com o inimigo, o personagem morre e o jogo reinicia.
+-Se o inimino só atirar, ele perde vidas.
+-Se o personagem alcançar o Portal do Mundo Real, ele ganha.
+-Quando um inimigo morre, outro surge imediatamente.
+*Ambiente
+-Ambiente de fliperama (top down) em 2D.
+-Grid em forma de labirinto, em cidade digital com contro no Portal de Luz.
+
 Mecânica 3 – Hackeamento
 Detalhes
 Alguns sistemas do Grid podem ser invadidos para abrir caminhos, desligar defesas ou controlar equipamentos.
