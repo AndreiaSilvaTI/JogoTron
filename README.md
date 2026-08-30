@@ -32,7 +32,7 @@ Jogo-Tron/
 │   ├── grid.js              # Geração do mapa, edifícios, portal e colisões
 │   ├── armas.js             # Lógica dos Discos de Ataque e Rastro de Luz (Light Trail)
 │   ├── personagens.js       # Classe do Jogador e renderização do Light Cycle
-│   ├── inimigos.js          # Inteligência Artificial dos inimigos
+│   ├── inimigos.js          # GPS dos inimigos
 │   └── main.js              # Loop principal, gerenciamento de estados e entradas
 ├── Jogo Tron - Codigo Fonte.html  # Ponto de entrada do jogo
 └── README.md                # Documentação técnica do projeto
