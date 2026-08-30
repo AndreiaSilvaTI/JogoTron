@@ -41,7 +41,7 @@ Influência nº 4
 Cyberpunk 2077 – Jogo
 Influência na exploração de cidades futuristas, progressão do personagem e liberdade de movimentação.
 
-A apresentação rápida
+Uma apresentação rápida
 TRON é um jogo de ação e aventura em terceira pessoa onde o jogador explora um universo digital vivo, combate programas corrompidos utilizando o Disco de Identidade, participa de corridas de Light Cycles e decide o futuro do Grid em uma história inédita inspirada nos filmes TRON."
 
 Descrição do Projeto (Resumo)
@@ -61,30 +61,34 @@ Universo totalmente digital e interativo.
 História inédita expandindo o universo dos filmes.
 
 Mecânicas Principais do Jogo
-Mecânica 1 – Combate com Disco de Identidade
-Detalhes
-O Disco funciona como arma principal durante todo o jogo. Pode ser usado em combate corpo a corpo, lançado contra inimigos ou utilizado para ativar dispositivos digitais.
-Como funciona
-O jogador realiza combinações de golpes leves, pesados e especiais. Após ser lançado, o Disco retorna automaticamente ao personagem.
-Mecânica 2 – Light Cycles
+
+Mecânica 1 – Light Cycles
 Detalhes
 As motocicletas digitais podem ser utilizadas para exploração, corridas e batalhas.
 Como funciona
 Durante a condução, a moto gera paredes de luz que podem destruir inimigos ou bloquear seus movimentos.
-
 ***Mecânica do jogo (prompts):***
 *Controles:
 -WASD / Setas: Movimentam o Personagem Light Cycle (moto).
 -Espaço: dispara o disco de luz.
--Destino: Portal de Luz, que leva para o Mundo Real.
+-Destino: Portal Final, que leva para o Mundo Real. O Portal Final (Portal Island) é um feixe de luz gigante foi adicionado no canto oposto do mapa (extremo inferior direito). Ao alcançar o portal, o jogador conclui a travessia e escapa do Grid para o mundo real.
+
 *Regras:
 -Se colidir com o inimigo, o personagem morre e o jogo reinicia.
 -Se o inimino só atirar, ele perde vidas.
+-Se o personagem perder todas as vidas, ele morre e o jogo reinicia.
 -Se o personagem alcançar o Portal do Mundo Real, ele ganha.
+-Se o personagem atirar no inimigo, ele morre. Se o personagem colidir com o inimigo, os dois morrem.
 -Quando um inimigo morre, outro surge imediatamente.
 *Ambiente
 -Ambiente de fliperama (top down) em 2D.
 -Grid em forma de labirinto, em cidade digital com contro no Portal de Luz.
+
+Mecânica 2 – Combate com Disco de Identidade
+Detalhes
+O Disco funciona como arma principal durante todo o jogo. Pode ser usado em combate corpo a corpo, lançado contra inimigos ou utilizado para ativar dispositivos digitais.
+Como funciona
+O jogador realiza combinações de golpes leves, pesados e especiais. Após ser lançado, o Disco retorna automaticamente ao personagem.
 
 Mecânica 3 – Hackeamento
 Detalhes
