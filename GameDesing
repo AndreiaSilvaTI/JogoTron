@@ -72,7 +72,6 @@ Durante a condução, a moto gera paredes de luz que podem destruir inimigos ou 
 -WASD / Setas: Movimentam o Personagem Light Cycle (moto).
 -Espaço: dispara o disco de luz.
 -Destino: Portal Final, que leva para o Mundo Real. O Portal Final (Portal Island) é um feixe de luz gigante foi adicionado no canto oposto do mapa (extremo inferior direito). Ao alcançar o portal, o jogador conclui a travessia e escapa do Grid para o mundo real.
-
 *Regras:
 -Se colidir com o inimigo, o personagem morre e o jogo reinicia.
 -Se o inimino só atirar, ele perde vidas.
