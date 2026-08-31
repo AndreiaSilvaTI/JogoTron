@@ -1,0 +1,19 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="orbCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="20%" stop-color="#bff3ff"/>
+      <stop offset="45%" stop-color="#33bfff"/>
+      <stop offset="75%" stop-color="#0077cc"/>
+      <stop offset="100%" stop-color="#004488" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <circle cx="50" cy="50" r="42" fill="#33bfff" opacity="0.25" filter="url(#glow)"/>
+  <circle cx="50" cy="50" r="34" fill="url(#orbCore)" filter="url(#glow)"/>
+  <circle cx="50" cy="50" r="34" fill="none" stroke="#eafcff" stroke-width="1" opacity="0.6"/>
+  <circle cx="50" cy="50" r="10" fill="#ffffff" opacity="0.85" filter="url(#glow)"/>
+</svg>

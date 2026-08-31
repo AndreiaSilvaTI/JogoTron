@@ -1,0 +1,21 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="face" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d1420"/>
+      <stop offset="100%" stop-color="#050810"/>
+    </linearGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect x="1" y="1" width="98" height="98" fill="url(#face)"/>
+  <rect x="1" y="1" width="98" height="98" fill="none" stroke="#00eaff" stroke-width="2" filter="url(#glow)"/>
+  <line x1="1" y1="34" x2="99" y2="34" stroke="#00eaff" stroke-width="0.8" opacity="0.35"/>
+  <line x1="1" y1="67" x2="99" y2="67" stroke="#00eaff" stroke-width="0.8" opacity="0.35"/>
+  <line x1="34" y1="1" x2="34" y2="99" stroke="#00eaff" stroke-width="0.8" opacity="0.25"/>
+  <line x1="67" y1="1" x2="67" y2="99" stroke="#00eaff" stroke-width="0.8" opacity="0.25"/>
+  <rect x="12" y="12" width="10" height="10" fill="#00eaff" opacity="0.5"/>
+  <rect x="78" y="78" width="10" height="10" fill="#00eaff" opacity="0.5"/>
+  <circle cx="50" cy="50" r="3" fill="#00eaff" opacity="0.7" filter="url(#glow)"/>
+</svg>
