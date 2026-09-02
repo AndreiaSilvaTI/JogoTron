@@ -44,7 +44,7 @@ linha 6 ficar inclinado
 linha 14 para implementar o código
 incorporado: linhas 11 e 12
 joystick virtual
-olhar os passos cno github do professor xxx/game
+olhar os passos cno github do professor tes7258/game
 vai carregar o jogo quando carregar a página.
 cena boot tem 3 seções: preload, create, update)
 API Fetch (preload): carrea em paralelo
@@ -52,6 +52,25 @@ create: disposição dos objetos na tela
 point over, pointer out(dedos clicam dentro ou fora da tela)
 documentario da netflix GDLK(para jogos que não tem tutorial, onde o usuário aprende jogando)
 
+***CENA DA TELA INICIAL***
+Pre-carregar para a tela não ficar preta f12 conexão 4G lenta.
+Verificar barra de progresso na inicialização.
+Pré carregamento anterior do jogo com o API FAST
+Criar uma cena para iniciar.
+
+Create:
+-1.precisa carregar o mapa
+-2.carregar as imagens
+-3.carregar as camadas
+-phisic (personagem se meche e tem colisão)
+
+Eixos do joystick: x negativo sobe e x desce e y sobre???? (se usar pc/teclado não precisa disso)
+
+
+///Fazer uma tela de avaliação no final do jogo para a feira 
+
+
+proxima entrega? fazer o mapa, colocar o personagem em cima do mapa, fazer o personagem se mecher
 
 
 
