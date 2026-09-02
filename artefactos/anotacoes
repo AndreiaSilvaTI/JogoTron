@@ -32,3 +32,28 @@ https://editor.keolot.com/
 https://editor.keolot.com/kpe/index.htm
 https://www.youtube.com/watch?v=Oy6gYiuEUag&t=7s
 
+****Epansão(proximas entregas)****
+Plataforma para rodar o jogo mobile https://developer.mozilla.org/pt-BR/docs/Web/API
+obs: testar funcionalidades para celular (inclinação, bateria, captar pressão, usar celular como joystick ou direrção, ligar câmera)
+-web serial(para usar hardware)
+-web rtc(comunicação em tempo real)
+Plataforma para gamepad: can i use
+
+Template para implementação: parcel(?)
+linha 6 ficar inclinado
+linha 14 para implementar o código
+incorporado: linhas 11 e 12
+joystick virtual
+olhar os passos cno github do professor xxx/game
+vai carregar o jogo quando carregar a página.
+cena boot tem 3 seções: preload, create, update)
+API Fetch (preload): carrea em paralelo
+create: disposição dos objetos na tela
+point over, pointer out(dedos clicam dentro ou fora da tela)
+documentario da netflix GDLK(para jogos que não tem tutorial, onde o usuário aprende jogando)
+
+
+
+
+
+
