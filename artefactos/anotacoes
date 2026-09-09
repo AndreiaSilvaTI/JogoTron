@@ -73,6 +73,23 @@ Eixos do joystick: x negativo sobe e x desce e y sobre???? (se usar pc/teclado n
 proxima entrega? fazer o mapa, colocar o personagem em cima do mapa, fazer o personagem se mecher
 
 
+***CAMADAS****
+-personagem pegar objetos
+-camera (zoom, efeito 3d); camera principal(camera main) segue o personagem principal.
+-som (pixabay): carregar os audios: load audio/ play loop (se não parar a musica na cena) 
+-colisão (camada de chão: sem colisão; camada de sombra;sem colisão; camada de fisica(physic)
+-efeitos: neblina, fumaça, chuva
+-iluminação (lights): setLighting (efeito de luz nos elementos)
+
+
+
+
+
+
+
+
+
+
 
 
 
