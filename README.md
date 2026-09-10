@@ -8,7 +8,7 @@ Equipe: ANDREIA CRISTINA DA SILVA e  FERNANDA MATTOS VIEIRA
 
 # TRON : THE GAME ARCADE
 
-Projeto de jogo 2D desenvolvido em HTML5 Canvas e JavaScript modularizado, inspirado no universo de **TRON**. O jogador controla um *Light Cycle* em uma cidade em malha (Grid), enfrentando inimigos e utilizando discos e rastros de luz para alcançar o portal de fuga.
+Projeto de jogo 2D desenvolvido em HTML5 Canvas e JavaScript modularizado, inspirado no universo de **TRON**. O jogador controla um *Light Cycle* em uma cidade em malha (Grid), enfrentando inimigos e utilizando discos e rastros de luz para alcançar o Portal de fuga para o mundo real.
 
 ---
 
