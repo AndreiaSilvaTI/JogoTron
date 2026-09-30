@@ -1,0 +1,1945 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRON // GRID CITY COMBAT</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --azul-neon: #4de3ff;
+    --azul-neon-escuro: #0f7a99;
+    --laranja-neon: #ff9331;
+    --preto-grid: #030710;
+    --vermelho-alerta: #ff3b3b;
+    --fonte-tron: 'Orbitron', 'Courier New', monospace;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    background: var(--preto-grid);
+    overflow: hidden;
+    font-family: var(--fonte-tron);
+  }
+
+  #game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background: var(--preto-grid);
+  }
+
+  #gameCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: var(--preto-grid);
+  }
+
+  .escondido {
+    display: none !important;
+  }
+
+  #hud {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+
+  .hud-barra {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .hud-label {
+    color: var(--azul-neon);
+    font-size: 12px;
+    letter-spacing: 2px;
+    width: 70px;
+    text-shadow: 0 0 6px var(--azul-neon);
+  }
+
+  .barra-fundo {
+    width: 200px;
+    height: 14px;
+    background: rgba(10, 20, 30, 0.8);
+    border: 1px solid var(--azul-neon-escuro);
+    box-shadow: 0 0 8px rgba(77, 227, 255, 0.3);
+  }
+
+  .barra-preenchimento {
+    height: 100%;
+    width: 100%;
+    transition: width 0.15s ease-out;
+  }
+
+  .barra-vida-cor {
+    background: linear-gradient(90deg, #ff3b3b, #ff8a4d);
+    box-shadow: 0 0 10px #ff5b3b;
+  }
+
+  .barra-energia-cor {
+    background: linear-gradient(90deg, var(--azul-neon-escuro), var(--azul-neon));
+    box-shadow: 0 0 10px var(--azul-neon);
+  }
+
+  .tela-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    background: rgba(3, 7, 16, 0.92);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    text-align: center;
+  }
+
+  .titulo-tron {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: 12px;
+    color: var(--azul-neon);
+    text-shadow: 0 0 12px var(--azul-neon), 0 0 40px var(--azul-neon-escuro);
+  }
+
+  .titulo-derrota {
+    color: var(--vermelho-alerta);
+    text-shadow: 0 0 12px var(--vermelho-alerta), 0 0 40px #7a0f0f;
+    font-size: 48px;
+    letter-spacing: 8px;
+  }
+
+  .titulo-vitoria {
+    color: #3bff5b;
+    text-shadow: 0 0 12px #3bff5b, 0 0 40px #0f7a28;
+    font-size: 40px;
+    letter-spacing: 8px;
+  }
+
+  .subtitulo-tron {
+    color: var(--azul-neon-escuro);
+    letter-spacing: 4px;
+    font-size: 13px;
+  }
+
+  .botao-tron {
+    margin-top: 10px;
+    padding: 14px 36px;
+    background: transparent;
+    color: var(--azul-neon);
+    border: 2px solid var(--azul-neon);
+    font-family: var(--fonte-tron);
+    font-size: 15px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(77, 227, 255, 0.4);
+    transition: all 0.2s ease;
+  }
+
+  .botao-tron:hover {
+    background: var(--azul-neon);
+    color: var(--preto-grid);
+    box-shadow: 0 0 25px var(--azul-neon);
+  }
+
+  .botao-derrota {
+    color: var(--vermelho-alerta);
+    border-color: var(--vermelho-alerta);
+    box-shadow: 0 0 10px rgba(255, 59, 59, 0.4);
+  }
+
+  .botao-derrota:hover {
+    background: var(--vermelho-alerta);
+    color: var(--preto-grid);
+    box-shadow: 0 0 25px var(--vermelho-alerta);
+  }
+
+  .painel-controles {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .linha-controle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--azul-neon);
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+
+  .teclado-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 26px);
+    grid-template-rows: repeat(2, 26px);
+    gap: 4px;
+  }
+
+  .tecla {
+    width: 26px;
+    height: 26px;
+    border: 1px solid var(--laranja-neon);
+    color: var(--laranja-neon);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    background: rgba(255, 147, 49, 0.08);
+  }
+
+  .tecla-espaco {
+    width: 90px;
+    height: 26px;
+    border: 1px solid var(--laranja-neon);
+    color: var(--laranja-neon);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    letter-spacing: 1px;
+    background: rgba(255, 147, 49, 0.08);
+  }
+
+  .vidas-contador {
+    display: flex;
+    gap: 6px;
+  }
+
+  .vida-item {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--azul-neon);
+    border: 1px solid var(--azul-neon);
+    border-radius: 4px;
+    background: rgba(77, 227, 255, 0.12);
+    text-shadow: 0 0 6px var(--azul-neon);
+    box-shadow: 0 0 8px rgba(77, 227, 255, 0.4);
+    transition: all 0.2s ease;
+  }
+
+  .vida-item.perdida {
+    color: #3a4650;
+    border-color: #2a343d;
+    background: rgba(10, 20, 30, 0.6);
+    text-shadow: none;
+    box-shadow: none;
+    text-decoration: line-through;
+  }
+
+  /* ===== CÂMERA DO FINAL ===== */
+  .tela-camera {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+  }
+
+  .camera-moldura {
+    position: absolute;
+    inset: 0;
+    background: var(--preto-grid);
+    overflow: hidden;
+    animation: abrir-camera 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+
+  @keyframes abrir-camera {
+    0%   { clip-path: inset(50% 0 50% 0); }
+    100% { clip-path: inset(0 0 0 0); }
+  }
+
+  #video-camera {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+    filter: saturate(0.8) contrast(1.1) hue-rotate(-10deg);
+  }
+
+  #canvas-derez {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .camera-moldura::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(77, 227, 255, 0.07) 0 2px, transparent 2px 5px);
+    box-shadow: inset 0 0 90px rgba(77, 227, 255, 0.45);
+  }
+
+  .camera-legenda {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 28px;
+    z-index: 3;
+    text-align: center;
+    color: var(--azul-neon);
+    font-size: 14px;
+    letter-spacing: 6px;
+    text-shadow: 0 0 10px var(--azul-neon);
+    animation: piscar 1.2s ease-in-out infinite;
+  }
+
+  @keyframes piscar {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+
+  /* Durante a desintegração: some o vídeo e o brilho, ficam só os blocos do canvas */
+  .camera-moldura.derez {
+    background: transparent;
+    animation: none;
+  }
+  .camera-moldura.derez #video-camera,
+  .camera-moldura.derez .camera-legenda { visibility: hidden; }
+  .camera-moldura.derez::before { display: none; }
+
+  .botao-surgir {
+    animation: surgir-botao 1s ease-out both;
+  }
+
+  @keyframes surgir-botao {
+    0%   { opacity: 0; transform: scale(0.8); filter: blur(6px); }
+    100% { opacity: 1; transform: scale(1); filter: blur(0); }
+  }
+
+  /* ===== FLASHES DE LED AZUL (TELA DE VITÓRIA) ===== */
+  .led-flashes {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
+
+  #tela-vitoria > *:not(.led-flashes) {
+    position: relative;
+    z-index: 1;
+  }
+
+  .led-pulso {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(77, 227, 255, 0.35), rgba(15, 122, 153, 0.08) 55%, transparent 80%);
+    animation: led-pulso 0.9s ease-in-out infinite alternate;
+  }
+
+  @keyframes led-pulso {
+    0%   { opacity: 0.15; filter: hue-rotate(0deg); }
+    100% { opacity: 0.75; filter: hue-rotate(25deg); }
+  }
+
+  .led-blob {
+    position: absolute;
+    border-radius: 50%;
+    animation: led-blob 0.6s ease-out forwards;
+  }
+
+  @keyframes led-blob {
+    0%   { opacity: 0;   transform: translate(-50%, -50%) scale(0.4); }
+    15%  { opacity: 0.9; }
+    100% { opacity: 0;   transform: translate(-50%, -50%) scale(1.6); }
+  }
+
+  .led-barra {
+    position: absolute;
+    left: 0;
+    right: 0;
+    animation: led-barra 0.4s ease-out forwards;
+  }
+
+  @keyframes led-barra {
+    0%   { opacity: 0;   transform: scaleX(0.2); }
+    20%  { opacity: 1; }
+    100% { opacity: 0;   transform: scaleX(1); }
+  }
+
+  .titulo-vitoria {
+    animation: titulo-led 0.8s ease-in-out infinite alternate;
+  }
+
+  @keyframes titulo-led {
+    0%   { text-shadow: 0 0 12px #3bff5b, 0 0 40px #0f7a28; }
+    100% { text-shadow: 0 0 18px #4de3ff, 0 0 60px #2d8cff, 0 0 90px #4de3ff; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .led-pulso, .titulo-vitoria { animation: none; }
+  }
+
+  .texto-branco {
+    color: #ffffff;
+  }
+
+  .badge-gps {
+    padding: 4px 10px;
+    border: 1px solid var(--vermelho-alerta);
+    color: var(--vermelho-alerta);
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    background: rgba(255, 59, 59, 0.1);
+  }
+</style>
+</head>
+<body>
+
+  <div id="game-container">
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="hud">
+      <div id="hud-vidas" class="hud-barra">
+        <span class="hud-label">VIDAS</span>
+        <div id="vidas-contador" class="vidas-contador"></div>
+      </div>
+      <div id="hud-vida" class="hud-barra">
+        <span class="hud-label">VIDA</span>
+        <div class="barra-fundo"><div id="barra-vida" class="barra-preenchimento barra-vida-cor"></div></div>
+      </div>
+      <div id="hud-energia" class="hud-barra">
+        <span class="hud-label">DISCO</span>
+        <div class="barra-fundo"><div id="barra-energia" class="barra-preenchimento barra-energia-cor"></div></div>
+      </div>
+    </div>
+
+    <div id="tela-menu" class="tela-overlay">
+      <h1 class="titulo-tron">TRON</h1>
+      <p class="subtitulo-tron">THE ARCADE GAME</p>
+      <button id="btn-iniciar" class="botao-tron">ENTRAR NO GRID</button>
+
+      <div class="painel-controles">
+        <div class="linha-controle">
+          <div class="teclado-grid">
+            <div></div><div class="tecla">▲</div><div></div>
+            <div class="tecla">◄</div><div class="tecla">▼</div><div class="tecla">►</div>
+          </div>
+          <span>— MOVER LIGHT CYCLE</span>
+        </div>
+
+        <div class="linha-controle">
+          <div class="tecla-espaco">ESPAÇO</div>
+          <span>— ARREMPASSAR DISCO</span>
+        </div>
+
+        <div class="linha-controle">
+          <span class="badge-gps">PORTAL</span>
+          <span>— CHEGUE AO FEIXE DE LUZ GIGANTE PARA RETORNAR</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="tela-derrota" class="tela-overlay escondido">
+      <h1 class="titulo-tron titulo-derrota">GAME OVER</h1>
+      <p class="subtitulo-tron texto-branco">Seu Light Cycle foi destruído no Grid.</p>
+      <button id="btn-reiniciar-derrota" class="botao-tron botao-derrota">REINICIAR JOGO</button>
+    </div>
+
+    <div id="tela-vitoria" class="tela-overlay escondido">
+      <div id="led-flashes" class="led-flashes"></div>
+      <h1 class="titulo-tron titulo-vitoria">Você ganhou!</h1>
+      <p class="subtitulo-tron texto-branco">Você alcançou o Portal e retornou ao mundo real.</p>
+      <button id="btn-reiniciar-vitoria" class="botao-tron escondido">JOGAR NOVAMENTE</button>
+    </div>
+
+    <div id="tela-camera" class="tela-camera escondido">
+      <div id="camera-moldura" class="camera-moldura">
+        <video id="video-camera" autoplay playsinline muted></video>
+        <canvas id="canvas-derez"></canvas>
+        <p class="camera-legenda">// CONEXÃO COM O MUNDO REAL //</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ==================== SINTETIZADOR DE ÁUDIO WEB AUDIO API ==================== */
+    let actx = null;
+    function getAudioCtx(){
+      if(!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+      if(actx.state === 'suspended') actx.resume();
+      return actx;
+    }
+
+    function envGain(ac, node, t0, attack, hold, release, peak){
+      const g = ac.createGain();
+      node.connect(g);
+      g.gain.setValueAtTime(0, t0);
+      g.gain.linearRampToValueAtTime(peak, t0+attack);
+      g.gain.setValueAtTime(peak, t0+attack+hold);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0+attack+hold+release);
+      return g;
+    }
+
+    function noiseBuffer(ac, dur){
+      const buf = ac.createBuffer(1, ac.sampleRate*dur, ac.sampleRate);
+      const d = buf.getChannelData(0);
+      for(let i=0;i<d.length;i++) d[i] = Math.random()*2-1;
+      return buf;
+    }
+
+    function playLaser(){
+      try {
+        const ac = getAudioCtx(); const t0 = ac.currentTime;
+        const src = ac.createBufferSource();
+        src.buffer = noiseBuffer(ac, 0.3);
+        const bp = ac.createBiquadFilter();
+        bp.type='bandpass'; bp.frequency.setValueAtTime(1800,t0); bp.Q.value=6;
+        const g1 = envGain(ac, bp, t0, 0.002, 0.02, 0.15, 0.5);
+        src.connect(bp); g1.connect(ac.destination);
+        src.start(t0); src.stop(t0+0.3);
+
+        const osc = ac.createOscillator();
+        osc.type='sawtooth';
+        osc.frequency.setValueAtTime(2200,t0);
+        osc.frequency.exponentialRampToValueAtTime(140, t0+0.28);
+        const g2 = envGain(ac, osc, t0, 0.001, 0.02, 0.26, 0.35);
+        osc.connect(g2); g2.connect(ac.destination);
+        osc.start(t0); osc.stop(t0+0.32);
+      } catch(e){}
+    }
+
+    function playThrow(){
+      try {
+        const ac = getAudioCtx(); const t0 = ac.currentTime;
+        const osc = ac.createOscillator();
+        osc.type='square';
+        osc.frequency.setValueAtTime(400,t0);
+        osc.frequency.linearRampToValueAtTime(1400, t0+0.18);
+        osc.frequency.linearRampToValueAtTime(200, t0+0.45);
+        const filt = ac.createBiquadFilter();
+        filt.type='bandpass'; filt.frequency.setValueAtTime(900,t0); filt.Q.value=3;
+        const g = envGain(ac, filt, t0, 0.01, 0.25, 0.2, 0.3);
+        osc.connect(filt); g.connect(ac.destination);
+        osc.start(t0); osc.stop(t0+0.5);
+      } catch(e){}
+    }
+
+    function playDerez(){
+      try {
+        const ac = getAudioCtx(); const t0 = ac.currentTime;
+        const src = ac.createBufferSource();
+        src.buffer = noiseBuffer(ac, 0.6);
+        const filt = ac.createBiquadFilter();
+        filt.type='lowpass';
+        filt.frequency.setValueAtTime(4000,t0);
+        filt.frequency.exponentialRampToValueAtTime(80, t0+0.55);
+        const g = envGain(ac, filt, t0, 0.005, 0.1, 0.5, 0.4);
+        src.connect(filt); g.connect(ac.destination);
+        src.start(t0); src.stop(t0+0.6);
+
+        const osc = ac.createOscillator();
+        osc.type='sine';
+        osc.frequency.setValueAtTime(800,t0);
+        osc.frequency.exponentialRampToValueAtTime(40, t0+0.5);
+        const g2 = envGain(ac, osc, t0, 0.005, 0.05, 0.45, 0.25);
+        osc.connect(g2); g2.connect(ac.destination);
+        osc.start(t0); osc.stop(t0+0.55);
+      } catch(e){}
+    }
+
+    function playPortal(){
+      try {
+        const ac = getAudioCtx(); const t0 = ac.currentTime;
+        for(let i=0;i<3;i++){
+          const osc = ac.createOscillator();
+          osc.type='sine';
+          const start = 150 + i*40;
+          osc.frequency.setValueAtTime(start, t0+i*0.03);
+          osc.frequency.exponentialRampToValueAtTime(start*9, t0+i*0.03+0.5);
+          const g = envGain(ac, osc, t0+i*0.03, 0.02, 0.3, 0.25, 0.15);
+          osc.connect(g); g.connect(ac.destination);
+          osc.start(t0+i*0.03); osc.stop(t0+i*0.03+0.6);
+        }
+      } catch(e){}
+    }
+
+    let motoNodes = null;
+    let motoLevel = 0;
+
+    function startMotoAudio(){
+      if(motoNodes) return;
+      try {
+        const ac = getAudioCtx();
+        const osc1 = ac.createOscillator(); osc1.type='sawtooth'; osc1.frequency.value=60;
+        const osc2 = ac.createOscillator(); osc2.type='square'; osc2.frequency.value=61.5;
+        const filt = ac.createBiquadFilter(); filt.type='lowpass'; filt.frequency.value=300;
+        const g = ac.createGain(); g.gain.value=0.0001;
+        osc1.connect(filt); osc2.connect(filt); filt.connect(g); g.connect(ac.destination);
+        osc1.start(); osc2.start();
+        motoNodes = {osc1,osc2,filt,g,ac};
+      } catch(e){}
+    }
+
+    function updateMotoAudio(isMoving) {
+      if(!motoNodes && isMoving) startMotoAudio();
+      if(!motoNodes) return;
+      
+      const {osc1,osc2,filt,g,ac} = motoNodes;
+      if(isMoving) {
+        motoLevel = Math.min(1, motoLevel + 0.04);
+      } else {
+        motoLevel = Math.max(0, motoLevel - 0.04);
+      }
+      
+      const t = ac.currentTime;
+      const freq = 55 + motoLevel*260;
+      osc1.frequency.setTargetAtTime(freq, t, 0.05);
+      osc2.frequency.setTargetAtTime(freq*1.02, t, 0.05);
+      filt.frequency.setTargetAtTime(300 + motoLevel*3000, t, 0.05);
+      g.gain.setTargetAtTime(0.01 + motoLevel*0.12, t, 0.05);
+
+      if(!isMoving && motoLevel <= 0.01) {
+        try { osc1.stop(t+0.05); osc2.stop(t+0.05); } catch(e){}
+        motoNodes = null;
+      }
+    }
+
+    function stopMotoAudioInstant() {
+      if(!motoNodes) return;
+      try {
+        motoNodes.osc1.stop();
+        motoNodes.osc2.stop();
+      } catch(e){}
+      motoNodes = null;
+      motoLevel = 0;
+    }
+
+    let padNodes = null;
+    function startPad(){
+      if(padNodes) return;
+      try {
+        const ac = getAudioCtx();
+        const notes = [55, 82.41, 110, 130.81];
+        const master = ac.createGain(); master.gain.value=0.0001;
+        master.connect(ac.destination);
+        master.gain.linearRampToValueAtTime(0.06, ac.currentTime+1.5);
+
+        const filt = ac.createBiquadFilter();
+        filt.type='lowpass'; filt.frequency.value=800;
+        filt.connect(master);
+
+        const lfo = ac.createOscillator(); lfo.type='sine'; lfo.frequency.value=0.08;
+        const lfoGain = ac.createGain(); lfoGain.gain.value=300;
+        lfo.connect(lfoGain); lfoGain.connect(filt.frequency);
+        lfo.start();
+
+        const oscs = notes.map((f,i)=>{
+          const o = ac.createOscillator();
+          o.type = i%2===0 ? 'sawtooth' : 'triangle';
+          o.frequency.value = f;
+          o.detune.value = (i-1.5)*4;
+          o.connect(filt);
+          o.start();
+          return o;
+        });
+
+        padNodes = {master, filt, lfo, oscs, ac};
+      } catch(e){}
+    }
+
+    function stopPad(){
+      if(!padNodes) return;
+      try {
+        const {master, lfo, oscs, ac} = padNodes;
+        const t = ac.currentTime;
+        master.gain.linearRampToValueAtTime(0.0001, t+0.5);
+        setTimeout(()=>{
+          try {
+            oscs.forEach(o=>o.stop());
+            lfo.stop();
+          } catch(e){}
+        }, 550);
+      } catch(e){}
+      padNodes = null;
+    }
+
+    /* ==================== ESTRUTURA DO JOGO ==================== */
+    const Interface = {
+      elementos: {},
+      inicializar() {
+        this.elementos.telaMenu = document.getElementById('tela-menu');
+        this.elementos.telaDerrota = document.getElementById('tela-derrota');
+        this.elementos.telaVitoria = document.getElementById('tela-vitoria');
+        this.elementos.btnIniciar = document.getElementById('btn-iniciar');
+        this.elementos.btnReiniciarDerrota = document.getElementById('btn-reiniciar-derrota');
+        this.elementos.btnReiniciarVitoria = document.getElementById('btn-reiniciar-vitoria');
+        this.elementos.barraVida = document.getElementById('barra-vida');
+        this.elementos.barraEnergia = document.getElementById('barra-energia');
+        this.elementos.vidasContador = document.getElementById('vidas-contador');
+        this.elementos.telaCamera = document.getElementById('tela-camera');
+        this.elementos.ledFlashes = document.getElementById('led-flashes');
+        this.elementos.moldura = document.getElementById('camera-moldura');
+        for (let i = 1; i <= VIDAS_MAX; i++) {
+          const item = document.createElement('div');
+          item.className = 'vida-item';
+          item.textContent = i;
+          this.elementos.vidasContador.appendChild(item);
+        }
+      },
+      atualizarVidas(vidasRestantes) {
+        const itens = this.elementos.vidasContador.children;
+        for (let i = 0; i < itens.length; i++) {
+          itens[i].classList.toggle('perdida', i >= vidasRestantes);
+        }
+      },
+      configurarBotoes(aoIniciar, aoReiniciar) {
+        this.elementos.btnIniciar.onclick = aoIniciar;
+        this.elementos.btnReiniciarDerrota.onclick = aoReiniciar;
+        this.elementos.btnReiniciarVitoria.onclick = aoReiniciar;
+      },
+      esconderMenu() { this.elementos.telaMenu.classList.add('escondido'); },
+      mostrarDerrota() { this.elementos.telaDerrota.classList.remove('escondido'); },
+      esconderDerrota() { this.elementos.telaDerrota.classList.add('escondido'); },
+      mostrarVitoria() {
+        this.elementos.btnReiniciarVitoria.classList.add('escondido');
+        this.elementos.btnReiniciarVitoria.classList.remove('botao-surgir');
+        this.elementos.telaVitoria.classList.remove('escondido');
+        this.iniciarFlashesLED();
+      },
+      ledTimer: null,
+      iniciarFlashesLED() {
+        this.pararFlashesLED();
+        const cont = this.elementos.ledFlashes;
+        cont.innerHTML = '<div class="led-pulso"></div>';
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        const cores = ['77,227,255', '40,140,255', '150,240,255', '60,100,255'];
+        const rnd = (a, b) => a + Math.random() * (b - a);
+        const disparar = () => {
+          if (cont.childElementCount > 40) return;
+          const cor = cores[Math.floor(Math.random() * cores.length)];
+          const el = document.createElement('div');
+          if (Math.random() < 0.7) {
+            const tam = rnd(160, 420);
+            el.className = 'led-blob';
+            el.style.width = el.style.height = tam + 'px';
+            el.style.left = rnd(0, 100) + '%';
+            el.style.top = rnd(0, 100) + '%';
+            el.style.background = `radial-gradient(circle, rgba(${cor},0.85) 0%, rgba(${cor},0.25) 40%, rgba(${cor},0) 70%)`;
+          } else {
+            el.className = 'led-barra';
+            el.style.top = rnd(0, 100) + '%';
+            el.style.height = rnd(2, 10) + 'px';
+            el.style.background = `linear-gradient(90deg, transparent, rgba(${cor},1), transparent)`;
+            el.style.boxShadow = `0 0 14px rgba(${cor},0.9)`;
+          }
+          el.addEventListener('animationend', () => el.remove());
+          cont.appendChild(el);
+        };
+        this.ledTimer = setInterval(() => {
+          disparar();
+          if (Math.random() < 0.35) disparar();
+        }, 200);
+      },
+      pararFlashesLED() {
+        if (this.ledTimer) clearInterval(this.ledTimer);
+        this.ledTimer = null;
+        if (this.elementos.ledFlashes) this.elementos.ledFlashes.innerHTML = '';
+      },
+      esconderVitoria() {
+        this.pararFlashesLED();
+        this.elementos.telaVitoria.classList.add('escondido');
+        this.elementos.telaCamera.classList.add('escondido');
+      },
+      mostrarBotaoVitoria() {
+        this.elementos.btnReiniciarVitoria.classList.remove('escondido');
+        this.elementos.btnReiniciarVitoria.classList.add('botao-surgir');
+      },
+      abrirCamera() {
+        this.elementos.moldura.classList.remove('derez');
+        this.elementos.telaCamera.classList.remove('escondido');
+        // reinicia a animação de abertura
+        this.elementos.moldura.style.animation = 'none';
+        void this.elementos.moldura.offsetWidth;
+        this.elementos.moldura.style.animation = '';
+      },
+      fecharCamera() {
+        this.elementos.telaCamera.classList.add('escondido');
+        this.elementos.moldura.classList.remove('derez');
+      },
+      atualizarHUD(jogador) {
+        const pctVida = Math.max(0, jogador.vida / jogador.vidaMax) * 100;
+        const pctEnergia = Math.max(0, jogador.energia / jogador.energiaMax) * 100;
+        this.elementos.barraVida.style.width = pctVida + '%';
+        this.elementos.barraEnergia.style.width = pctEnergia + '%';
+      }
+    };
+
+    function caminhoCapsula(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
+
+    // Roda vista de cima: pneu arredondado, aro neon, sulcos e cubo central
+    function desenharRodaTopDown(ctx, cx, meioComp, meioLarg, corNeon, corPneu) {
+      const x = cx - meioComp, y = -meioLarg, w = meioComp * 2, h = meioLarg * 2;
+      const r = Math.min(meioComp, meioLarg) * 0.9;
+
+      ctx.fillStyle = corPneu;
+      caminhoCapsula(ctx, x, y, w, h, r);
+      ctx.fill();
+      ctx.strokeStyle = corNeon;
+      ctx.lineWidth = 2;
+      ctx.shadowColor = corNeon;
+      ctx.shadowBlur = 8;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // sulcos da banda de rodagem
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.16)';
+      ctx.lineWidth = 1;
+      for (let i = -2; i <= 2; i++) {
+        const tx = cx + i * (meioComp * 0.4);
+        ctx.beginPath();
+        ctx.moveTo(tx, -meioLarg + 2.5);
+        ctx.lineTo(tx, meioLarg - 2.5);
+        ctx.stroke();
+      }
+
+      // aro de luz
+      ctx.strokeStyle = corNeon;
+      ctx.globalAlpha = 0.85;
+      ctx.lineWidth = 1.4;
+      caminhoCapsula(ctx, x + 3, y + 3, w - 6, h - 6, Math.max(1, r - 3));
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      // cubo
+      ctx.fillStyle = corNeon;
+      ctx.beginPath();
+      ctx.arc(cx, 0, 1.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function desenharMotoDespedacada(ctx, corNeon) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(10, 5, 5, 0.7)';
+      ctx.beginPath();
+      ctx.arc(0, 0, 18, 0, Math.PI * 2);
+      ctx.fill();
+
+      // pedaço do casco
+      ctx.fillStyle = '#111';
+      ctx.strokeStyle = corNeon;
+      ctx.lineWidth = 1.5;
+      ctx.fillRect(8, -12, 10, 14);
+      ctx.strokeRect(8, -12, 10, 14);
+
+      // roda quebrada
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.arc(-6, 6, 7, 0.4, Math.PI * 1.4);
+      ctx.stroke();
+
+      ctx.fillStyle = corNeon;
+      ctx.fillRect(-12, -14, 4, 4);
+      ctx.fillRect(10, 8, 5, 4);
+      ctx.fillRect(-6, 12, 4, 4);
+
+      ctx.restore();
+    }
+
+    function desenharLightCycleTopDown(ctx, corNeon, escuroPneu, destruida = false) {
+      if (destruida) {
+        desenharMotoDespedacada(ctx, corNeon);
+        return;
+      }
+
+      ctx.save();
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+
+      // rastro de brilho sob a moto
+      const brilho = ctx.createRadialGradient(0, 0, 4, 0, 0, 34);
+      brilho.addColorStop(0, 'rgba(255,255,255,0.06)');
+      brilho.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = brilho;
+      ctx.beginPath();
+      ctx.arc(0, 0, 34, 0, Math.PI * 2);
+      ctx.fill();
+
+      // carenagem (corpo) com curvas suaves
+      const grad = ctx.createLinearGradient(-15, 0, 16, 0);
+      grad.addColorStop(0, '#08121f');
+      grad.addColorStop(1, '#0c1d31');
+      ctx.fillStyle = grad;
+      ctx.strokeStyle = corNeon;
+      ctx.lineWidth = 1.8;
+      ctx.shadowColor = corNeon;
+      ctx.shadowBlur = 6;
+      ctx.beginPath();
+      ctx.moveTo(16, 0);
+      ctx.bezierCurveTo(14, -6, 8, -9.5, -2, -9.5);
+      ctx.bezierCurveTo(-9, -9.5, -13, -7, -14, -3);
+      ctx.quadraticCurveTo(-15.5, 0, -14, 3);
+      ctx.bezierCurveTo(-13, 7, -9, 9.5, -2, 9.5);
+      ctx.bezierCurveTo(8, 9.5, 14, 6, 16, 0);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // faixas de luz laterais
+      ctx.strokeStyle = corNeon;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(12, -3.5);
+      ctx.quadraticCurveTo(2, -7.5, -10, -5.5);
+      ctx.moveTo(12, 3.5);
+      ctx.quadraticCurveTo(2, 7.5, -10, 5.5);
+      ctx.stroke();
+
+      // rodas (traseira maior, dianteira menor) por cima das pontas do corpo
+      desenharRodaTopDown(ctx, -20, 12, 9, corNeon, escuroPneu);
+      desenharRodaTopDown(ctx, 21, 9, 6.5, corNeon, escuroPneu);
+
+      // piloto / capacete
+      ctx.fillStyle = '#020408';
+      ctx.strokeStyle = corNeon;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.ellipse(-2, 0, 6.5, 5.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = corNeon;
+      ctx.globalAlpha = 0.5;
+      ctx.beginPath();
+      ctx.ellipse(-0.5, 0, 2.6, 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      // farol
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = corNeon;
+      ctx.shadowBlur = 10;
+      caminhoCapsula(ctx, 27, -1.6, 4, 3.2, 1.4);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      ctx.restore();
+    }
+
+    class Destroco {
+      constructor(x, y, cor) {
+        this.x = x;
+        this.y = y;
+        this.cor = cor;
+        this.angulo = Math.random() * Math.PI * 2;
+      }
+      desenhar(ctx, camera) {
+        ctx.save();
+        ctx.translate(this.x - camera.x, this.y - camera.y);
+        ctx.rotate(this.angulo);
+        desenharMotoDespedacada(ctx, this.cor);
+        ctx.restore();
+      }
+    }
+
+    class Jogador {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.tamanho = 22;
+
+        this.vidaMax = 100;
+        this.vida = this.vidaMax;
+        this.energiaMax = 100;
+        this.energia = this.energiaMax;
+
+        this.velocidade = 450;
+        this.direcao = { x: 1, y: 0 };
+        this.cor = '#4de3ff';
+        this.destruido = false;
+        this.emMovimento = false;
+      }
+
+      atualizar(dt, input, mundo) {
+        if (this.destruido) {
+          updateMotoAudio(false);
+          return;
+        }
+
+        let dx = 0, dy = 0;
+        if (input.cima) dy -= 1;
+        if (input.baixo) dy += 1;
+        if (input.esquerda) dx -= 1;
+        if (input.direita) dx += 1;
+
+        this.emMovimento = (dx !== 0 || dy !== 0);
+        updateMotoAudio(this.emMovimento);
+
+        if (this.emMovimento) {
+          const comp = Math.hypot(dx, dy);
+          dx /= comp;
+          dy /= comp;
+          this.direcao = { x: dx, y: dy };
+
+          const novoX = this.x + dx * this.velocidade * dt;
+          const novoY = this.y + dy * this.velocidade * dt;
+
+          if (!mundo.colideComParede(novoX, this.y, this.tamanho)) this.x = novoX;
+          if (!mundo.colideComParede(this.x, novoY, this.tamanho)) this.y = novoY;
+        }
+
+        this.energia = Math.min(this.energiaMax, this.energia + 25 * dt);
+
+        this.x = Math.max(this.tamanho, Math.min(mundo.largura - this.tamanho, this.x));
+        this.y = Math.max(this.tamanho, Math.min(mundo.altura - this.tamanho, this.y));
+      }
+
+      podeArremessarDisco() { return !this.destruido && this.energia >= 30; }
+
+      receberAtaqueInimigo() {
+        if (this.destruido) return;
+        playLaser();
+        Efeitos.impacto(this.x, this.y, '#ff5b3b', 1);
+        this.energia = 0;
+        this.vida -= 40;
+        if (this.vida <= 0) {
+          this.vida = 0;
+          this.destruir();
+        }
+      }
+
+      destruir() {
+        if (this.destruido) return;
+        playDerez();
+        Efeitos.impacto(this.x, this.y, this.cor, 1.6);
+        stopMotoAudioInstant();
+        this.vida = 0;
+        this.energia = 0;
+        this.destruido = true;
+      }
+
+      ganharVida(quantidade) {
+        if (this.destruido) return;
+        this.vida = Math.min(this.vidaMax, this.vida + quantidade);
+      }
+
+      estaVivo() { return !this.destruido && this.vida > 0; }
+
+      desenhar(ctx, camera) {
+        const sx = this.x - camera.x;
+        const sy = this.y - camera.y;
+
+        ctx.save();
+        ctx.translate(sx, sy);
+        const angulo = Math.atan2(this.direcao.y, this.direcao.x);
+        ctx.rotate(angulo);
+
+        desenharLightCycleTopDown(ctx, this.cor, '#071624', this.destruido);
+
+        ctx.restore();
+      }
+    }
+
+    class Inimigo {
+      constructor(x, y, cor) {
+        this.x = x;
+        this.y = y;
+        this.tamanho = 20;
+        this.velocidade = 250;
+        this.cor = cor || '#ff5b3b';
+        this.morto = false;
+        this.proximoTiroEm = 0;
+        this.direcaoAtual = { x: 1, y: 0 };
+      }
+
+      atualizar(dt, jogador, mundo, tempoAtual, criarDiscoInimigo) {
+        if (this.morto) return;
+
+        const dx = jogador.x - this.x;
+        const dy = jogador.y - this.y;
+        const distJogador = Math.hypot(dx, dy);
+
+        let dirX = dx / (distJogador || 1);
+        let dirY = dy / (distJogador || 1);
+
+        const anguloBase = Math.atan2(dirY, dirX);
+        const checarFrente = mundo.colideComParede(
+          this.x + Math.cos(anguloBase) * 40,
+          this.y + Math.sin(anguloBase) * 40,
+          this.tamanho
+        );
+
+        if (checarFrente) {
+          const esqX = Math.cos(anguloBase - Math.PI / 3);
+          const esqY = Math.sin(anguloBase - Math.PI / 3);
+          if (!mundo.colideComParede(this.x + esqX * 40, this.y + esqY * 40, this.tamanho)) {
+            dirX = esqX;
+            dirY = esqY;
+          } else {
+            dirX = Math.cos(anguloBase + Math.PI / 3);
+            dirY = Math.sin(anguloBase + Math.PI / 3);
+          }
+        }
+
+        this.direcaoAtual = { x: dirX, y: dirY };
+
+        const novoX = this.x + dirX * this.velocidade * dt;
+        const novoY = this.y + dirY * this.velocidade * dt;
+
+        if (!mundo.colideComParede(novoX, this.y, this.tamanho)) this.x = novoX;
+        if (!mundo.colideComParede(this.x, novoY, this.tamanho)) this.y = novoY;
+
+        if (jogador.estaVivo() && distJogador < this.tamanho + jogador.tamanho) {
+          jogador.receberAtaqueInimigo();
+        }
+
+        if (jogador.estaVivo() && distJogador < 480 && tempoAtual > this.proximoTiroEm) {
+          criarDiscoInimigo(this.x, this.y, dirX, dirY, this.cor);
+          this.proximoTiroEm = tempoAtual + 2000 + Math.random() * 500;
+        }
+      }
+
+      desenhar(ctx, camera) {
+        if (this.morto) return;
+        const sx = this.x - camera.x;
+        const sy = this.y - camera.y;
+
+        ctx.save();
+        ctx.translate(sx, sy);
+        const angulo = Math.atan2(this.direcaoAtual.y, this.direcaoAtual.x);
+        ctx.rotate(angulo);
+
+        desenharLightCycleTopDown(ctx, this.cor, '#200707', false);
+
+        ctx.restore();
+      }
+    }
+
+    class Disco {
+      constructor(x, y, dirX, dirY, eDoJogador = true, cor = '#4de3ff') {
+        this.x = x;
+        this.y = y;
+        this.dirX = dirX;
+        this.dirY = dirY;
+        this.velocidade = 650;
+        this.alcance = 420;
+        this.distanciaPercorrida = 0;
+        this.retornando = false;
+        this.raio = 8;
+        this.finalizado = false;
+        this.eDoJogador = eDoJogador;
+        this.cor = cor;
+        this.acumOnda = 0;
+      }
+
+      atualizar(dt, jogador, inimigos, tempoAtual, mundo, adicionarDestroco) {
+        const deslocamento = this.velocidade * dt;
+
+        // rastro que se dissipa + ondas que vibram o grid ao longo do trajeto
+        Efeitos.faisca(this.x, this.y, this.cor, 1, 50, 0.5, 2.2);
+        this.acumOnda += deslocamento;
+        if (this.acumOnda > 140) {
+          this.acumOnda = 0;
+          Efeitos.onda(this.x, this.y, this.cor, 2.5, 0.55, 900);
+        }
+
+        if (!this.retornando) {
+          const nx = this.x + this.dirX * deslocamento;
+          const ny = this.y + this.dirY * deslocamento;
+
+          if (mundo.colideComParede(nx, ny, this.raio)) {
+            this.retornando = true;
+            playLaser();
+            Efeitos.impacto(this.x, this.y, this.cor, 0.6);
+          } else {
+            this.x = nx;
+            this.y = ny;
+            this.distanciaPercorrida += deslocamento;
+            if (this.distanciaPercorrida >= this.alcance) this.retornando = true;
+          }
+        } else {
+          const alvoX = this.eDoJogador ? jogador.x : this.x;
+          const alvoY = this.eDoJogador ? jogador.y : this.y;
+          const dx = alvoX - this.x;
+          const dy = alvoY - this.y;
+          const dist = Math.hypot(dx, dy);
+
+          if (this.eDoJogador && dist < 20) {
+            Efeitos.dissipar(this.x, this.y, this.cor);
+            this.finalizado = true;
+            return;
+          }
+
+          if (!this.eDoJogador && this.distanciaPercorrida > this.alcance * 1.8) {
+            Efeitos.dissipar(this.x, this.y, this.cor);
+            this.finalizado = true;
+            return;
+          }
+
+          this.x += (dx / (dist || 1)) * deslocamento;
+          this.y += (dy / (dist || 1)) * deslocamento;
+        }
+
+        if (this.eDoJogador) {
+          for (const inimigo of inimigos) {
+            if (inimigo.morto) continue;
+            if (Math.hypot(inimigo.x - this.x, inimigo.y - this.y) < this.raio + inimigo.tamanho) {
+              inimigo.morto = true;
+              playDerez();
+              adicionarDestroco(inimigo.x, inimigo.y, inimigo.cor);
+              jogador.ganharVida(25);
+              Efeitos.impacto(inimigo.x, inimigo.y, inimigo.cor, 1);
+              this.finalizado = true;
+              break;
+            }
+          }
+        } else {
+          if (jogador.estaVivo() && Math.hypot(jogador.x - this.x, jogador.y - this.y) < this.raio + jogador.tamanho) {
+            jogador.receberAtaqueInimigo();
+            this.finalizado = true;
+          }
+        }
+      }
+
+      desenhar(ctx, camera) {
+        const sx = this.x - camera.x;
+        const sy = this.y - camera.y;
+        ctx.save();
+        ctx.fillStyle = this.cor;
+        ctx.beginPath();
+        ctx.arc(sx, sy, this.raio, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    class RastroLuz {
+      constructor() {
+        this.pontos = [];
+        this.duracaoMs = 2600;
+        this.distanciaMinima = 8;
+      }
+
+      registrarPonto(x, y, tempoAtual) {
+        const ultimo = this.pontos[this.pontos.length - 1];
+        if (!ultimo || Math.hypot(x - ultimo.x, y - ultimo.y) >= this.distanciaMinima) {
+          this.pontos.push({ x, y, criadoEm: tempoAtual });
+        }
+      }
+
+      atualizar(tempoAtual) {
+        while (this.pontos.length && tempoAtual - this.pontos[0].criadoEm > this.duracaoMs) {
+          this.pontos.shift();
+        }
+      }
+
+      verificarColisoes(inimigos, jogador, adicionarDestroco) {
+        for (const inimigo of inimigos) {
+          if (inimigo.morto) continue;
+          for (const ponto of this.pontos) {
+            if (Math.hypot(inimigo.x - ponto.x, inimigo.y - ponto.y) < inimigo.tamanho + 5) {
+              inimigo.morto = true;
+              playDerez();
+              adicionarDestroco(inimigo.x, inimigo.y, inimigo.cor);
+              jogador.ganharVida(25);
+              Efeitos.impacto(inimigo.x, inimigo.y, inimigo.cor, 1);
+              break;
+            }
+          }
+        }
+      }
+
+      desenhar(ctx, camera, tempoAtual) {
+        if (this.pontos.length < 2) return;
+        ctx.save();
+
+        ctx.strokeStyle = 'rgba(77, 227, 255, 0.4)';
+        ctx.lineWidth = 12;
+
+        for (let i = 1; i < this.pontos.length; i++) {
+          const p1 = this.pontos[i - 1];
+          const p2 = this.pontos[i];
+          const idade = (tempoAtual - p2.criadoEm) / this.duracaoMs;
+          ctx.globalAlpha = Math.max(0, 1 - idade);
+          ctx.beginPath();
+          ctx.moveTo(p1.x - camera.x, p1.y - camera.y);
+          ctx.lineTo(p2.x - camera.x, p2.y - camera.y);
+          ctx.stroke();
+        }
+
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 3;
+
+        for (let i = 1; i < this.pontos.length; i++) {
+          const p1 = this.pontos[i - 1];
+          const p2 = this.pontos[i];
+          const idade = (tempoAtual - p2.criadoEm) / this.duracaoMs;
+          ctx.globalAlpha = Math.max(0, 1 - idade);
+          ctx.beginPath();
+          ctx.moveTo(p1.x - camera.x, p1.y - camera.y);
+          ctx.lineTo(p2.x - camera.x, p2.y - camera.y);
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      }
+    }
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function ajustarCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    ajustarCanvas();
+    window.addEventListener('resize', ajustarCanvas);
+
+    /* ==================== MUNDO DO GAME ==================== */
+    const Mundo = {
+      largura: 3400,
+      altura: 3400,
+      tamanhoQuarteirao: 280,
+      larguraRua: 160,
+      paredes: [],
+      predios: [],
+      portal: { x: 3100, y: 3100, raio: 110 },
+
+      gerarCidade() {
+        this.paredes = [];
+        this.predios = [];
+        const passo = this.tamanhoQuarteirao + this.larguraRua;
+        const espessuraBorda = 60;
+
+        // Paredes Limítrofes externas
+        this.paredes.push({ x: 0, y: 0, largura: this.largura, altura: espessuraBorda });
+        this.paredes.push({ x: 0, y: this.altura - espessuraBorda, largura: this.largura, altura: espessuraBorda });
+        this.paredes.push({ x: 0, y: 0, largura: espessuraBorda, altura: this.altura });
+        this.paredes.push({ x: this.largura - espessuraBorda, y: 0, largura: espessuraBorda, altura: this.altura });
+
+        for (let x = this.larguraRua; x < this.largura - this.tamanhoQuarteirao; x += passo) {
+          for (let y = this.larguraRua; y < this.altura - this.tamanhoQuarteirao; y += passo) {
+            if (Math.abs(x - 300) < 200 && Math.abs(y - 300) < 200) continue;
+            if (Math.hypot(x - this.portal.x, y - this.portal.y) < 450) continue;
+
+            this.paredes.push({
+              x: x,
+              y: y,
+              largura: this.tamanhoQuarteirao,
+              altura: this.tamanhoQuarteirao
+            });
+
+            const janelas = [];
+            for (let c = 0; c < 4; c++) {
+              for (let l = 0; l < 4; l++) {
+                janelas.push({
+                  relX: 40 + c * 54,
+                  relY: 40 + l * 54,
+                  ativa: Math.random() > 0.3
+                });
+              }
+            }
+
+            this.predios.push({
+              x: x,
+              y: y,
+              w: this.tamanhoQuarteirao,
+              h: this.tamanhoQuarteirao,
+              corBorda: Math.random() > 0.5 ? '#ff9331' : '#0f7a99',
+              janelas: janelas
+            });
+          }
+        }
+      },
+
+      colideComParede(x, y, raio) {
+        for (const p of this.paredes) {
+          if (x + raio > p.x && x - raio < p.x + p.largura &&
+              y + raio > p.y && y - raio < p.y + p.altura) {
+            return true;
+          }
+        }
+        return false;
+      },
+
+      desenhar(ctx, camera, tempoAtual) {
+        // 1. LINHAS DO GRID: Apenas dentro dos limites do mapa
+        ctx.save();
+        const minX = Math.max(0, -camera.x);
+        const minY = Math.max(0, -camera.y);
+        const maxX = Math.min(canvas.width, this.largura - camera.x);
+        const maxY = Math.min(canvas.height, this.altura - camera.y);
+
+        ctx.beginPath();
+        ctx.rect(minX, minY, maxX - minX, maxY - minY);
+        ctx.clip(); 
+
+        const inten = Efeitos.intensidade();
+        ctx.strokeStyle = `rgba(${Math.round(15 + inten * 62)}, ${Math.round(122 + inten * 105)}, ${Math.round(153 + inten * 102)}, ${0.25 + inten * 0.4})`;
+        ctx.lineWidth = 1 + inten * 0.8;
+        const celula = 80;
+        const passo = 40;
+        const inicioX = Math.floor(camera.x / celula) * celula;
+        const inicioY = Math.floor(camera.y / celula) * celula;
+
+        ctx.beginPath();
+        for (let x = inicioX; x < camera.x + canvas.width + celula; x += celula) {
+          for (let sy = 0; sy <= canvas.height + passo; sy += passo) {
+            Efeitos.deslocamento(x, sy + camera.y, tempoAtual);
+            const px = x - camera.x + Efeitos.dx;
+            const py = sy + Efeitos.dy;
+            if (sy === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+          }
+        }
+        ctx.stroke();
+
+        ctx.beginPath();
+        for (let y = inicioY; y < camera.y + canvas.height + celula; y += celula) {
+          for (let sx = 0; sx <= canvas.width + passo; sx += passo) {
+            Efeitos.deslocamento(sx + camera.x, y, tempoAtual);
+            const px = sx + Efeitos.dx;
+            const py = y - camera.y + Efeitos.dy;
+            if (sx === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+          }
+        }
+        ctx.stroke();
+        ctx.restore();
+
+        // Sinalização de Borda Externa (Borda vermelha neon)
+        ctx.save();
+        ctx.strokeStyle = '#ff3b3b';
+        ctx.lineWidth = 6;
+        ctx.strokeRect(30 - camera.x, 30 - camera.y, this.largura - 60, this.altura - 60);
+        ctx.restore();
+
+        // Prédios
+        for (const predio of this.predios) {
+          const sx = predio.x - camera.x;
+          const sy = predio.y - camera.y;
+          if (sx + predio.w < 0 || sx > canvas.width || sy + predio.h < 0 || sy > canvas.height) continue;
+
+          ctx.fillStyle = '#030812';
+          ctx.strokeStyle = predio.corBorda;
+          ctx.lineWidth = 2;
+          ctx.fillRect(sx, sy, predio.w, predio.h);
+          ctx.strokeRect(sx, sy, predio.w, predio.h);
+
+          for (const j of predio.janelas) {
+            if (j.ativa) {
+              ctx.fillStyle = predio.corBorda === '#ff9331' ? 'rgba(255, 147, 49, 0.6)' : 'rgba(77, 227, 255, 0.6)';
+              ctx.fillRect(sx + j.relX, sy + j.relY, 22, 22);
+            }
+          }
+        }
+
+        // 2. FEIXE DE LUZ GIGANTE (Portal)
+        const psx = this.portal.x - camera.x;
+        const psy = this.portal.y - camera.y;
+        
+        ctx.save();
+        ctx.translate(psx, psy);
+
+        const feixeGrad = ctx.createRadialGradient(0, 0, 10, 0, 0, 200);
+        feixeGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+        feixeGrad.addColorStop(0.3, 'rgba(94, 244, 255, 0.7)');
+        feixeGrad.addColorStop(0.7, 'rgba(15, 122, 153, 0.25)');
+        feixeGrad.addColorStop(1, 'rgba(3, 7, 16, 0)');
+
+        ctx.fillStyle = feixeGrad;
+        ctx.beginPath();
+        ctx.arc(0, 0, 200, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#5ef4ff';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(0, 0, this.portal.raio + Math.sin(tempoAtual * 0.005) * 6, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(0, 0, 26, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      }
+    };
+
+    /* ==================== EFEITOS: DISSIPAÇÃO DOS LASERS + VIBRAÇÃO DO GRID ==================== */
+    const Efeitos = {
+      particulas: [],
+      ondas: [],
+      vibracao: 0,
+      agora: 0,
+      dx: 0,
+      dy: 0,
+
+      limpar() {
+        this.particulas = [];
+        this.ondas = [];
+        this.vibracao = 0;
+      },
+
+      faisca(x, y, cor, n, vel, vida, tam) {
+        for (let i = 0; i < n; i++) {
+          if (this.particulas.length > 500) return;
+          const ang = Math.random() * Math.PI * 2;
+          const sp = vel * (0.3 + Math.random() * 0.7);
+          const v = vida * (0.6 + Math.random() * 0.8);
+          this.particulas.push({
+            x, y, cor, tam,
+            vx: Math.cos(ang) * sp,
+            vy: Math.sin(ang) * sp,
+            vida: v, vidaMax: v
+          });
+        }
+      },
+
+      onda(x, y, cor, forca, vel = 0.7, dur = 1600) {
+        this.ondas.push({ x, y, cor, forca, vel, dur, largura: 260, t0: this.agora });
+        if (this.ondas.length > 10) this.ondas.shift();
+      },
+
+      vibrar(v) { this.vibracao = Math.min(1, this.vibracao + v); },
+
+      intensidade() { return Math.min(1, this.vibracao + this.ondas.length * 0.06); },
+
+      lancamento(x, y, cor) {
+        this.faisca(x, y, cor, 6, 160, 0.35, 2);
+        this.onda(x, y, cor, 4, 0.6, 1200);
+        this.vibrar(0.2);
+      },
+
+      impacto(x, y, cor, forca = 1) {
+        this.faisca(x, y, cor, Math.round(18 * forca), 320, 0.7, 3);
+        this.faisca(x, y, '#ffffff', Math.round(6 * forca), 200, 0.4, 2);
+        this.onda(x, y, cor, 9 * forca, 0.75, 1700);
+        this.vibrar(0.55 * forca);
+      },
+
+      dissipar(x, y, cor) {
+        this.faisca(x, y, cor, 8, 120, 0.6, 2.5);
+        this.onda(x, y, cor, 3, 0.5, 1100);
+        this.vibrar(0.12);
+      },
+
+      atualizar(dt, agora) {
+        this.agora = agora;
+        for (let i = this.particulas.length - 1; i >= 0; i--) {
+          const p = this.particulas[i];
+          p.vida -= dt;
+          if (p.vida <= 0) { this.particulas.splice(i, 1); continue; }
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          const f = Math.max(0, 1 - dt * 2.8);
+          p.vx *= f;
+          p.vy *= f;
+        }
+        this.ondas = this.ondas.filter(o => agora - o.t0 < o.dur);
+        this.vibracao *= Math.exp(-dt * 2.5);
+        if (this.vibracao < 0.005) this.vibracao = 0;
+      },
+
+      // Deslocamento do ponto (mundo) do grid causado pelas ondas e pela vibração
+      deslocamento(wx, wy, agora) {
+        let dx = 0, dy = 0;
+        for (const o of this.ondas) {
+          const idade = Math.max(0, agora - o.t0);
+          const ddx = wx - o.x, ddy = wy - o.y;
+          const d = Math.hypot(ddx, ddy) || 1;
+          const atras = o.vel * idade - d;
+          if (atras < 0 || atras > o.largura) continue;
+          const t = idade / o.dur;
+          const amp = o.forca * (1 - t) * (1 - atras / o.largura);
+          const val = amp * Math.sin(atras * 0.16);
+          dx += (ddx / d) * val;
+          dy += (ddy / d) * val;
+        }
+        const v = this.vibracao;
+        if (v > 0.01) {
+          dx += Math.sin(wy * 0.05 + agora * 0.09) * v * 3;
+          dy += Math.cos(wx * 0.05 + agora * 0.11) * v * 3;
+        }
+        this.dx = dx;
+        this.dy = dy;
+      },
+
+      desenharOndas(ctx, camera, agora) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        for (const o of this.ondas) {
+          const idade = Math.max(0, agora - o.t0);
+          const t = idade / o.dur;
+          if (t >= 1) continue;
+          ctx.globalAlpha = (1 - t) * 0.5;
+          ctx.strokeStyle = o.cor;
+          ctx.lineWidth = 2 + o.forca * 0.4;
+          ctx.beginPath();
+          ctx.arc(o.x - camera.x, o.y - camera.y, idade * o.vel, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        ctx.restore();
+      },
+
+      desenharParticulas(ctx, camera) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        for (const p of this.particulas) {
+          const a = Math.max(0, p.vida / p.vidaMax);
+          ctx.globalAlpha = a;
+          ctx.fillStyle = p.cor;
+          ctx.beginPath();
+          ctx.arc(p.x - camera.x, p.y - camera.y, p.tam * (0.4 + 0.6 * a), 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+    };
+
+    const VIDAS_MAX = 5;
+    let vidas = VIDAS_MAX;
+
+    let jogador, inimigos, discos, rastro, destrocos, camera;
+    let rodando = false;
+    let ultimoTempo = 0;
+
+    const input = { cima: false, baixo: false, esquerda: false, direita: false };
+
+    const paletaCoresInimigo = ['#ff3b3b', '#ff3bda', '#9d3bff', '#3bff5b', '#ffee3b', '#ff7b00'];
+
+    function gerarCorAleatoria() {
+      return paletaCoresInimigo[Math.floor(Math.random() * paletaCoresInimigo.length)];
+    }
+
+    function adicionarDestroco(x, y, cor) {
+      destrocos.push(new Destroco(x, y, cor));
+    }
+
+    function iniciarNovoJogo() {
+      stopPad();
+      stopMotoAudioInstant();
+      startPad();
+
+      vidas = VIDAS_MAX;
+      Interface.atualizarVidas(vidas);
+      Efeitos.limpar();
+
+      Mundo.gerarCidade();
+      jogador = new Jogador(300, 300);
+      inimigos = [];
+      discos = [];
+      destrocos = [];
+      rastro = new RastroLuz();
+      camera = { x: 0, y: 0 };
+
+      spawnInimigo();
+
+      Interface.esconderVitoria();
+      Interface.esconderDerrota();
+      Interface.esconderMenu();
+      rodando = true;
+      ultimoTempo = performance.now();
+      requestAnimationFrame(loop);
+    }
+
+    /* ==================== SEQUÊNCIA FINAL: CÂMERA + DESINTEGRAÇÃO ==================== */
+    const esperar = (ms) => new Promise(r => setTimeout(r, ms));
+
+    const CameraJogador = {
+      stream: null,
+      async abrir() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return false;
+        try {
+          this.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+        } catch (e) {
+          this.stream = null;
+          return false;
+        }
+        const video = document.getElementById('video-camera');
+        video.srcObject = this.stream;
+        try { await video.play(); } catch (e) {}
+        if (!video.videoWidth) {
+          await new Promise(r => { video.onloadedmetadata = r; setTimeout(r, 1500); });
+        }
+        return true;
+      },
+      parar() {
+        if (this.stream) this.stream.getTracks().forEach(t => t.stop());
+        this.stream = null;
+        const video = document.getElementById('video-camera');
+        video.srcObject = null;
+      }
+    };
+
+    // Congela o quadro da câmera e o desfaz em blocos (efeito "derez")
+    function desintegrarCamera(duracao = 2400) {
+      return new Promise(resolve => {
+        const video = document.getElementById('video-camera');
+        const cv = document.getElementById('canvas-derez');
+        const c = cv.getContext('2d');
+        const W = cv.width = window.innerWidth;
+        const H = cv.height = window.innerHeight;
+
+        // captura o quadro atual (espelhado, cobrindo a tela inteira)
+        const quadro = document.createElement('canvas');
+        quadro.width = W; quadro.height = H;
+        const qc = quadro.getContext('2d');
+        const vw = video.videoWidth || W, vh = video.videoHeight || H;
+        const esc = Math.max(W / vw, H / vh);
+        const dw = vw * esc, dh = vh * esc;
+        qc.save();
+        qc.translate(W, 0);
+        qc.scale(-1, 1);
+        qc.drawImage(video, (W - dw) / 2, (H - dh) / 2, dw, dh);
+        qc.restore();
+
+        CameraJogador.parar(); // apaga a luz da câmera
+
+        const B = 32;
+        const blocos = [];
+        for (let y = 0; y < H; y += B) {
+          for (let x = 0; x < W; x += B) {
+            blocos.push({
+              x, y,
+              atraso: (0.55 * (y / H) + 0.45 * Math.random()) * 0.65,
+              dx: (Math.random() - 0.5) * 50,
+              dy: 30 + Math.random() * 70
+            });
+          }
+        }
+        const fatia = 0.35;
+
+        function quadroAnim(prog) {
+          c.clearRect(0, 0, W, H);
+          for (const b of blocos) {
+            const p = Math.min(1, Math.max(0, (prog - b.atraso) / fatia));
+            if (p >= 1) continue;
+            const ox = b.dx * p, oy = -b.dy * p;
+            c.globalAlpha = 1 - p;
+            c.drawImage(quadro, b.x, b.y, B, B, b.x + ox, b.y + oy, B, B);
+            if (p > 0) {
+              c.globalAlpha = Math.sin(p * Math.PI) * 0.7;
+              c.fillStyle = '#4de3ff';
+              c.fillRect(b.x + ox, b.y + oy, B, B);
+            }
+          }
+          c.globalAlpha = 1;
+        }
+
+        quadroAnim(0);
+        Interface.elementos.moldura.classList.add('derez');
+
+        const inicio = performance.now();
+        (function passo(agora) {
+          const prog = (agora - inicio) / duracao;
+          if (prog >= 1) {
+            c.clearRect(0, 0, W, H);
+            resolve();
+            return;
+          }
+          quadroAnim(prog);
+          requestAnimationFrame(passo);
+        })(inicio);
+      });
+    }
+
+    async function sequenciaVitoria() {
+      Interface.mostrarVitoria();
+      try {
+        await esperar(2500);
+        const ok = await CameraJogador.abrir();
+        if (ok) {
+          Interface.abrirCamera();
+          await esperar(4500);
+          playDerez();
+          await desintegrarCamera();
+          Interface.fecharCamera();
+        }
+      } catch (e) {
+        CameraJogador.parar();
+        Interface.fecharCamera();
+      }
+      Interface.mostrarBotaoVitoria();
+    }
+
+    function reaparecer() {
+      stopMotoAudioInstant();
+      startPad();
+      Efeitos.limpar();
+
+      jogador = new Jogador(300, 300);
+      inimigos = [];
+      discos = [];
+      rastro = new RastroLuz();
+      camera = { x: 0, y: 0 };
+
+      spawnInimigo();
+
+      rodando = true;
+      ultimoTempo = performance.now();
+      requestAnimationFrame(loop);
+    }
+
+    function spawnInimigo() {
+      let x, y;
+      do {
+        x = Math.random() * Mundo.largura;
+        y = Math.random() * Mundo.altura;
+      } while (Math.hypot(x - jogador.x, y - jogador.y) < 600 || Mundo.colideComParede(x, y, 20));
+
+      inimigos.push(new Inimigo(x, y, gerarCorAleatoria()));
+    }
+
+    function arremessarDiscoJogador() {
+      if (!jogador.podeArremessarDisco()) return;
+      playThrow();
+      jogador.energia -= 30;
+      discos.push(new Disco(jogador.x, jogador.y, jogador.direcao.x, jogador.direcao.y, true, jogador.cor));
+      Efeitos.lancamento(jogador.x, jogador.y, jogador.cor);
+    }
+
+    function criarDiscoInimigo(x, y, dirX, dirY, cor) {
+      playThrow();
+      discos.push(new Disco(x, y, dirX, dirY, false, cor));
+      Efeitos.lancamento(x, y, cor);
+    }
+
+    function loop(tempoAtual) {
+      if (!rodando) return;
+      const dt = Math.min(0.05, (tempoAtual - ultimoTempo) / 1000);
+      ultimoTempo = tempoAtual;
+
+      atualizar(dt, tempoAtual);
+      desenhar(tempoAtual);
+
+      requestAnimationFrame(loop);
+    }
+
+    function atualizar(dt, tempoAtual) {
+      Efeitos.atualizar(dt, tempoAtual);
+      jogador.atualizar(dt, input, Mundo);
+
+      if (jogador.estaVivo()) {
+        rastro.registrarPonto(jogador.x, jogador.y, tempoAtual);
+      }
+      rastro.atualizar(tempoAtual);
+      rastro.verificarColisoes(inimigos, jogador, adicionarDestroco);
+
+      for (const inimigo of inimigos) {
+        inimigo.atualizar(dt, jogador, Mundo, tempoAtual, criarDiscoInimigo);
+      }
+
+      for (const disco of discos) {
+        disco.atualizar(dt, jogador, inimigos, tempoAtual, Mundo, adicionarDestroco);
+      }
+      discos = discos.filter(d => !d.finalizado);
+      inimigos = inimigos.filter(i => !i.morto);
+
+      if (inimigos.length === 0 && jogador.estaVivo()) {
+        spawnInimigo();
+      }
+
+      const distPortal = Math.hypot(jogador.x - Mundo.portal.x, jogador.y - Mundo.portal.y);
+      if (jogador.estaVivo() && distPortal < Mundo.portal.raio) {
+        rodando = false;
+        playPortal();
+        stopMotoAudioInstant();
+        stopPad();
+        sequenciaVitoria();
+        return;
+      }
+
+      camera.x = jogador.x - canvas.width / 2;
+      camera.y = jogador.y - canvas.height / 2;
+
+      Interface.atualizarHUD(jogador);
+
+      if (!jogador.estaVivo()) {
+        adicionarDestroco(jogador.x, jogador.y, jogador.cor);
+        rodando = false;
+        stopPad();
+
+        vidas = Math.max(0, vidas - 1);
+        Interface.atualizarVidas(vidas);
+
+        if (vidas > 0) {
+          setTimeout(reaparecer, 1200);
+        } else {
+          setTimeout(() => {
+            Interface.mostrarDerrota();
+          }, 800);
+        }
+      }
+    }
+
+    function desenhar(tempoAtual) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      Mundo.desenhar(ctx, camera, tempoAtual);
+      Efeitos.desenharOndas(ctx, camera, tempoAtual);
+      for (const d of destrocos) d.desenhar(ctx, camera);
+      rastro.desenhar(ctx, camera, tempoAtual);
+      for (const inimigo of inimigos) inimigo.desenhar(ctx, camera);
+      for (const disco of discos) disco.desenhar(ctx, camera);
+      Efeitos.desenharParticulas(ctx, camera);
+      jogador.desenhar(ctx, camera);
+    }
+
+    window.addEventListener('keydown', (e) => {
+      switch (e.code) {
+        case 'ArrowUp': input.cima = true; break;
+        case 'ArrowDown': input.baixo = true; break;
+        case 'ArrowLeft': input.esquerda = true; break;
+        case 'ArrowRight': input.direita = true; break;
+        case 'Space':
+          if (rodando) arremessarDiscoJogador();
+          e.preventDefault();
+          break;
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      switch (e.code) {
+        case 'ArrowUp': input.cima = false; break;
+        case 'ArrowDown': input.baixo = false; break;
+        case 'ArrowLeft': input.esquerda = false; break;
+        case 'ArrowRight': input.direita = false; break;
+      }
+    });
+
+    Interface.inicializar();
+    Interface.configurarBotoes(iniciarNovoJogo, iniciarNovoJogo);
+  </script>
+</body>
+</html>
