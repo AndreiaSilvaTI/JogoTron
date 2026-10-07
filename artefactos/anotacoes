@@ -101,7 +101,17 @@ proxima entrega? fazer o mapa, colocar o personagem em cima do mapa, fazer o per
 -pubsub : MQTT
 -broker
 
-
+***********COncluir esta semana************
+-o multiplayer
+-colocar o numero do jogador(1 ou 2)
+-numero da partida
+-qual é a fase
+-jogo/jogador/fase
+-publish(publicar a situação do jogador)
+####identificar quem entrar na partida###
+-se existe espelhar na tela dele o que ele estiver fazendo
+-senão criar o jogador
+-o # indica o 'todos' do filtro mqtt
 
 
 
